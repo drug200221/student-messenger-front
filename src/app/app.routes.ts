@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
-import { IndexComponent } from './user/pages/index/index.component';
 import { SidenavComponent } from './shared/sidenav/sidenav.component';
+import { MessageAreaComponent } from './user/components/message-area/message-area.component';
 
 export const routes: Routes = [
   {
-    path: '',
+    path: 'chats',
     component: SidenavComponent,
     children: [
-      { path: 'A', component: IndexComponent },
+      { path: ':chatId', component: MessageAreaComponent },
     ],
   },
 ];

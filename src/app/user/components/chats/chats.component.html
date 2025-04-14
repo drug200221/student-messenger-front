@@ -1,18 +1,31 @@
-<mat-form-field [style.width]="'100%'">
-  <input matInput placeholder="Поиск">
-  <mat-icon matSuffix>search</mat-icon>
-</mat-form-field>
+<div class="field_search">
+  <button [matMenuTriggerFor]="menu" [style.margin-top]="'4px'" mat-icon-button>
+    <mat-icon>more_vert</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu" [style.margin]="0">
+    <button mat-menu-item>
+      <mat-icon>archive</mat-icon>
+      <span>Архив</span>
+    </button>
+  </mat-menu>
+
+  <mat-form-field subscriptSizing="dynamic">
+    <input matInput placeholder="Поиск">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+</div>
 <mat-tab-group>
   <mat-tab label="Все">
     <mat-selection-list>
       @for (item of items; track item) {
         <mat-list-item>
-          <psk-chat-item></psk-chat-item>
+          <psk-chat-item [id]="item"></psk-chat-item>
         </mat-list-item>
       }
     </mat-selection-list>
   </mat-tab>
-  <mat-tab label="Все">
+  <mat-tab label="Сгруппированные">
     <mat-selection-list>
       @for (item of items; track item) {
         <mat-list-item>

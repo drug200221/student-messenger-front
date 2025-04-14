@@ -1,0 +1,42 @@
+mat-toolbar {
+  background-color: white;
+  height: 55px;
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  .person {
+    display: flex;
+    align-items: center;
+
+    .avatar {
+      margin-top: 8px;
+
+      img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+      }
+    }
+
+    .content {
+      margin-left: 16px;
+
+      .top {
+        .user-title {
+          font-size: 0.9em;
+          line-height: 1;
+        }
+      }
+
+      .bottom {
+        .info {
+          font-size: 0.8em;
+          line-height: 1;
+          margin-bottom: 4px;
+        }
+      }
+    }
+  }
+}

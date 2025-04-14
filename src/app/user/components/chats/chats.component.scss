@@ -1,4 +1,18 @@
+.field_search {
+  display: flex;
+  align-items: stretch;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+mat-list-item {
+  height: 72px !important;
+}
+
 .btn-create-chat {
+  z-index: 1;
   position: absolute;
   bottom: 20px;
   right: 20px;

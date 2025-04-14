@@ -1,1 +1,18 @@
-<p>chat-item works!</p>
+<div [routerLink]="[id]" class="dialog">
+  <img alt="" src="img.png"/>
+  <div class="column">
+    <div class="dialog-title">
+      <div class="title"><b>Фамилия Имя Отчество длинное</b></div>
+      <div class="message-info">
+        <span class="message-status">
+            <mat-icon color="primary">check</mat-icon>
+            <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
+        </span>
+        <span class="message-time">10:10</span>
+      </div>
+    </div>
+    <div class="dialog-subtitle">
+      <span>Ооооооооооооооооооочень длинное последнее сообщение</span>
+    </div>
+  </div>
+</div>

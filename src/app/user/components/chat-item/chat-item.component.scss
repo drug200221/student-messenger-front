@@ -1,0 +1,61 @@
+.dialog {
+  display: flex;
+  flex-flow: row nowrap;
+
+  img {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+  }
+
+  .column {
+    flex: 1;
+    flex-direction: column;
+    margin-left: 16px;
+
+    .dialog-title {
+      display: flex;
+      justify-content: space-between;
+
+      .title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+      }
+
+      .message-info {
+        display: flex;
+        align-items: flex-start;
+        margin-right: 5%;
+
+        .message-status {
+          position: relative;
+
+          .overlapping-icon {
+            position: absolute;
+            left: 5px;
+            clip-path: inset(0 0 0 22%);
+          }
+
+          mat-icon {
+            font-size: 1.3em;
+          }
+        }
+
+        .message-time {
+          font-size: 0.9em;
+        }
+      }
+    }
+
+    .dialog-subtitle {
+      display: flex;
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 310px;
+      }
+    }
+  }
+}
