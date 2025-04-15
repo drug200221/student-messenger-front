@@ -1,6 +1,6 @@
 <div class="field_search">
   <button [matMenuTriggerFor]="menu" [style.margin-top]="'4px'" mat-icon-button>
-    <mat-icon>more_vert</mat-icon>
+    <mat-icon>more_horiz</mat-icon>
   </button>
 
   <mat-menu #menu="matMenu" [style.margin]="0">
@@ -19,7 +19,7 @@
   <mat-tab label="Все">
     <mat-selection-list>
       @for (item of items; track item) {
-        <mat-list-item [activated]="chatId === item">
+        <mat-list-item (click)="setActive(item)"  [activated]="activeItem === item" [ngClass]="activeItem === item ? 'active' : ''">
           <psk-chat-item [id]="item"></psk-chat-item>
         </mat-list-item>
       }

@@ -9,7 +9,10 @@
 
 mat-list-item {
   height: 72px !important;
-  width: 100% !important;
+}
+
+.active {
+  background-color: rgb(225, 227, 239) !important;
 }
 
 .btn-create-chat {
@@ -17,6 +20,10 @@ mat-list-item {
   position: absolute;
   bottom: 20px;
   right: 20px;
+}
+
+mat-tab {
+  overflow: auto;
 }
 
 

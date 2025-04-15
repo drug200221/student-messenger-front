@@ -1,22 +1,36 @@
 mat-sidenav-container {
   height: 100%;
-}
+  mat-sidenav {
+    max-width: 420px;
 
-mat-sidenav {
-  width: 420px;
-}
 
-mat-nav-list {
-  margin: 0;
-  padding: 0;
-}
+    .no-scroll {
+      overflow: hidden;
+    }
 
-mat-sidenav-content {
-  min-height: 90vh;
+    mat-nav-list {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  mat-sidenav-content {
+    min-height: 90vh;
+  }
 }
 
 @media (max-width: 600px) {
-  mat-sidenav {
-    width: 100%;
+  mat-sidenav-container {
+    mat-sidenav {
+      max-width: 600px;
+      width: 100%;
+      overflow: hidden;
+    }
   }
 }
+
+
+
+
+
+

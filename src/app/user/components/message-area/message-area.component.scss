@@ -20,12 +20,23 @@
       align-items: center;
 
       .avatar {
-        margin-top: 8px;
+        min-width: 42px;
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1em;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: white;
 
         img {
-          width: 42px;
-          height: 42px;
-          border-radius: 50%;
+          width: 100%;
+          height: 100%;
+        }
+
+        img:empty {
+          display: none;
         }
       }
 
