@@ -19,7 +19,7 @@
   <mat-tab label="Все">
     <mat-selection-list>
       @for (item of items; track item) {
-        <mat-list-item>
+        <mat-list-item [activated]="chatId === item">
           <psk-chat-item [id]="item"></psk-chat-item>
         </mat-list-item>
       }

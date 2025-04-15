@@ -1,41 +1,138 @@
-mat-toolbar {
-  background-color: white;
-  height: 55px;
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
-  .spacer {
-    flex: 1 1 auto;
+  mat-toolbar {
+    background-color: white;
+    height: 55px;
+
+    .spacer {
+      flex: 1 1 auto;
+    }
+
+    .btn-back {
+      display: none;
+    }
+
+    .person {
+      display: flex;
+      align-items: center;
+
+      .avatar {
+        margin-top: 8px;
+
+        img {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+        }
+      }
+
+      .content {
+        margin-left: 16px;
+
+        .top {
+          .user-title {
+            font-size: 0.9em;
+            line-height: 1;
+          }
+        }
+
+        .bottom {
+          .info {
+            font-size: 0.8em;
+            line-height: 1;
+            margin-bottom: 4px;
+          }
+        }
+      }
+    }
   }
 
-  .person {
+  .messages {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    flex-grow: 1;
+    margin: 0 auto;
+    max-width: 640px;
 
-    .avatar {
-      margin-top: 8px;
 
-      img {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
+    .message-display {
+      display: flex;
+      flex-grow: 1;
+      flex-direction: column;
+      overflow: auto;
+
+      .recipient {
+        display: flex;
+        justify-content: right;
+      }
+
+      mat-card {
+        margin: 8px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        max-width: 70%;
+        width: fit-content;
+        overflow-wrap: break-word;
+
+        mat-card-content {
+          padding: 4px;
+        }
+
+        mat-card-footer {
+          display: flex;
+          justify-content: flex-end;
+          padding: 0;
+        }
+
+        .info {
+          display: flex;
+          align-items: flex-start;
+
+          .status {
+            position: relative;
+
+            .overlapping-icon {
+              position: absolute;
+              left: 5px;
+              clip-path: inset(0 0 0 20%);
+            }
+
+            mat-icon {
+              font-size: 1.3em;
+              height: 14px;
+            }
+          }
+
+          .text {
+            font-size: 0.9em;
+            margin-right: 4px;
+          }
+        }
       }
     }
 
-    .content {
-      margin-left: 16px;
+    .message-input {
+      display: flex;
+      margin: 0 8px;
 
-      .top {
-        .user-title {
-          font-size: 0.9em;
-          line-height: 1;
-        }
+      mat-form-field {
+        width: 100%;
       }
+    }
+  }
+}
 
-      .bottom {
-        .info {
-          font-size: 0.8em;
-          line-height: 1;
-          margin-bottom: 4px;
-        }
+@media (max-width: 925px) {
+  .container {
+    mat-toolbar {
+      .btn-back {
+        display: flex;
+        margin-right: 8px;
       }
     }
   }

@@ -14,3 +14,9 @@ mat-nav-list {
 mat-sidenav-content {
   min-height: 90vh;
 }
+
+@media (max-width: 600px) {
+  mat-sidenav {
+    width: 100%;
+  }
+}

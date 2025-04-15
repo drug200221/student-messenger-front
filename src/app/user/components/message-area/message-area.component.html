@@ -1,34 +1,78 @@
-<mat-toolbar class="mat-elevation-z1">
-  <div class="person">
-    <div class="avatar">
-      <img alt="" src="img.png"/>
-    </div>
-    <div class="content">
-      <div class="top">
-        <span class="user-title"><b>Фамилия Имя Отчество длинное</b></span>
+<div class="container">
+  <mat-toolbar class="mat-elevation-z1">
+    <button class="btn-back" mat-icon-button>
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="person">
+      <div class="avatar">
+        <img alt="" src="img.png"/>
       </div>
-      <div class="bottom">
-        <div class="info">
-          <span>5 минут назад</span>
+      <div class="content">
+        <div class="top">
+          <span class="user-title"><b>Фамилия Имя Отчество длинное</b></span>
+        </div>
+        <div class="bottom">
+          <div class="info">
+            <span>5 минут назад</span>
+          </div>
         </div>
       </div>
     </div>
+    <span class="spacer"></span>
+    <button mat-icon-button matTooltip="Когда нибудь...">
+      <mat-icon>search</mat-icon>
+    </button>
+    <button [matMenuTriggerFor]="menu" mat-icon-button>
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>notifications_off</mat-icon>
+        <span>Отключить уведомелния</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon color="warn">delete</mat-icon>
+        <span>Удалить чат</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+
+  <div class="messages">
+    <div class="message-display">
+      <div class="recipient">
+        <mat-card>
+          <mat-card-content>Привет ddddddddddddddddddddddddddddddddddddd
+            ddddddddddddddddddddddddddddddddddddnnnnnnnnnnnnnn jjjjj jjjjjjjjj jjjjjjjj
+          </mat-card-content>
+          <mat-card-footer class="info">
+            <span class="text">edited</span>
+            <span class="text">10:10</span>
+            <span class="status">
+              <mat-icon color="primary">check</mat-icon>
+              <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
+          </span>
+          </mat-card-footer>
+        </mat-card>
+      </div>
+      <div class="sender">
+        <mat-card>
+          <mat-card-content>Привет</mat-card-content>
+          <mat-card-footer class="info">
+            <span class="text">10:10</span>
+          </mat-card-footer>
+        </mat-card>
+      </div>
+    </div>
+
+    <form class="message-input">
+      <mat-form-field>
+        <input matInput placeholder="Сообщение">
+        <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+        <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
+      </mat-form-field>
+      <button [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
+        <mat-icon>send</mat-icon>
+      </button>
+    </form>
   </div>
-  <span class="spacer"></span>
-  <button mat-icon-button matTooltip="Когда нибудь...">
-    <mat-icon>search</mat-icon>
-  </button>
-  <button [matMenuTriggerFor]="menu" mat-icon-button>
-    <mat-icon>more_vert</mat-icon>
-  </button>
-  <mat-menu #menu="matMenu">
-    <button mat-menu-item>
-      <mat-icon>notifications_off</mat-icon>
-      <span>Отключить уведомелния</span>
-    </button>
-    <button mat-menu-item>
-      <mat-icon color="warn">delete</mat-icon>
-      <span>Удалить чат</span>
-    </button>
-  </mat-menu>
-</mat-toolbar>
+</div>
