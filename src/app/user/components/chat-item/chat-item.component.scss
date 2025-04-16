@@ -27,7 +27,7 @@
 
   .column {
     margin-left: 16px;
-    width: calc(100% - 16px);
+    width: 100%;
 
     .row {
       display: flex;
@@ -35,18 +35,20 @@
       align-items: center;
 
       .dialog-title {
+        margin-right: 0;
         width: 75%;
         overflow: hidden;
         text-overflow: ellipsis;
-        flex-grow: 0;
       }
 
       .message-info {
+        width: 80px;
         display: flex;
         margin-left: 8px;
-        margin-right: 55px;
+        margin-right: 10%;
 
         .message-status {
+          margin-left: auto;
           position: relative;
 
           mat-icon {
@@ -71,16 +73,6 @@
       width: 85%;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .dialog {
-    .column {
-      .subtitle {
-        width: 90%;
-      }
     }
   }
 }

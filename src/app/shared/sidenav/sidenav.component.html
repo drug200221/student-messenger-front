@@ -1,8 +1,8 @@
 <mat-sidenav-container>
-  <mat-sidenav [opened]="true" mode="side">
-    <mat-nav-list>
+  <mat-sidenav [opened]="sidenavService.isSidenavOpened()" mode="side">
+    <div>
       <psk-chats></psk-chats>
-    </mat-nav-list>
+    </div>
   </mat-sidenav>
   <mat-sidenav-content>
     <router-outlet></router-outlet>

@@ -22,8 +22,8 @@ mat-list-item {
   right: 20px;
 }
 
-mat-tab {
-  overflow: auto;
+mat-tab-group {
+  height: calc(100vh - 55px);
 }
 
 

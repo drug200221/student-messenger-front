@@ -1,50 +1,47 @@
 <div class="container">
   <mat-toolbar class="mat-elevation-z1">
-    <button class="btn-back" mat-icon-button>
+    <button (click)="goBack()" class="btn-back" mat-icon-button>
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div class="person">
       <div class="avatar">
-        <img src="" alt="" />
+        <img alt="" src=""/>
         ФИ
       </div>
-      <div class="content">
+      <div class="column">
         <div class="top">
-          <span class="user-title"><b>Фамилия Имя Отчество длинное</b></span>
+          <span class="user-title"><b>Фамилия Имя Отчество</b></span>
         </div>
         <div class="bottom">
-          <div class="info">
-            <span>5 минут назад</span>
-          </div>
+          <span class="info">5 минут назад</span>
         </div>
       </div>
     </div>
-    <span class="spacer"></span>
-    <button mat-icon-button matTooltip="Когда нибудь...">
-      <mat-icon>search</mat-icon>
-    </button>
-    <button [matMenuTriggerFor]="menu" mat-icon-button>
-      <mat-icon>more_vert</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item>
-        <mat-icon>notifications_off</mat-icon>
-        <span>Отключить уведомелния</span>
+    <div>
+      <button mat-icon-button matTooltip="Когда нибудь...">
+        <mat-icon>search</mat-icon>
       </button>
-      <button mat-menu-item>
-        <mat-icon color="warn">delete</mat-icon>
-        <span>Удалить чат</span>
+      <button [matMenuTriggerFor]="menu" mat-icon-button>
+        <mat-icon>more_vert</mat-icon>
       </button>
-    </mat-menu>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item>
+          <mat-icon>notifications_off</mat-icon>
+          <span>Отключить уведомелния</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon color="warn">delete</mat-icon>
+          <span>Удалить чат</span>
+        </button>
+      </mat-menu>
+    </div>
   </mat-toolbar>
 
   <div class="messages">
     <div class="message-display">
       <div class="recipient">
         <mat-card>
-          <mat-card-content>Привет ddddddddddddddddddddddddddddddddddddd
-            ddddddddddddddddddddddddddddddddddddnnnnnnnnnnnnnn jjjjj jjjjjjjjj jjjjjjjj
-          </mat-card-content>
+          <mat-card-content>Привет</mat-card-content>
           <mat-card-footer class="info">
             <span class="text">edited</span>
             <span class="text">10:10</span>

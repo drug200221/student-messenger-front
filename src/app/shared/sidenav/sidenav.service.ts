@@ -4,10 +4,10 @@ import { Injectable, signal } from '@angular/core';
   providedIn: 'root',
 })
 export class SidenavService {
-  public sidenavOpen = signal(true);
+  public isSidenavOpened = signal(true);
 
   public toggleSidenav() {
-    this.sidenavOpen.set(!this.sidenavOpen());
+    this.isSidenavOpened.set(!this.isSidenavOpened());
   }
 
   public getChats(userId: number) {

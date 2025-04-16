@@ -1,21 +1,19 @@
 mat-sidenav-container {
   height: 100%;
+
   mat-sidenav {
     max-width: 420px;
+    height: 100%;
 
-
-    .no-scroll {
+    div {
       overflow: hidden;
-    }
-
-    mat-nav-list {
-      margin: 0;
-      padding: 0;
+      height: 100%;
     }
   }
 
   mat-sidenav-content {
     min-height: 90vh;
+    min-width: 420px;
   }
 }
 
@@ -24,7 +22,6 @@ mat-sidenav-container {
     mat-sidenav {
       max-width: 600px;
       width: 100%;
-      overflow: hidden;
     }
   }
 }

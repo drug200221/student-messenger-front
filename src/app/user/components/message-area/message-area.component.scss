@@ -6,10 +6,7 @@
   mat-toolbar {
     background-color: white;
     height: 55px;
-
-    .spacer {
-      flex: 1 1 auto;
-    }
+    justify-content: space-between;
 
     .btn-back {
       display: none;
@@ -17,6 +14,7 @@
 
     .person {
       display: flex;
+      overflow: hidden;
       align-items: center;
 
       .avatar {
@@ -27,7 +25,7 @@
         justify-content: center;
         font-size: 1em;
         border-radius: 50%;
-        background-color: #007bff;
+        background-color: green;
         color: white;
 
         img {
@@ -40,18 +38,31 @@
         }
       }
 
-      .content {
+      .column {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
         margin-left: 16px;
+        width: 100%;
 
         .top {
+          display: flex;
+          overflow: hidden;
+
           .user-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
             font-size: 0.9em;
-            line-height: 1;
           }
         }
 
         .bottom {
+          display: flex;
+          overflow: hidden;
+
           .info {
+            overflow: hidden;
+            text-overflow: ellipsis;
             font-size: 0.8em;
             line-height: 1;
             margin-bottom: 4px;
@@ -64,20 +75,26 @@
   .messages {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    height: calc(100% - 55px);
     margin: 0 auto;
     max-width: 640px;
-
+    width: 100%;
 
     .message-display {
       display: flex;
-      flex-grow: 1;
       flex-direction: column;
+      height: 100%;
       overflow: auto;
 
       .recipient {
         display: flex;
         justify-content: right;
+      }
+
+      .sender {
+        mat-card {
+          background-color: rgb(225, 227, 239);
+        }
       }
 
       mat-card {

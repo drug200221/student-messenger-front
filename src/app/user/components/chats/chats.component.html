@@ -15,15 +15,17 @@
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 </div>
+
 <mat-tab-group>
   <mat-tab label="Все">
-    <mat-selection-list>
+    <mat-nav-list>
       @for (item of items; track item) {
-        <mat-list-item (click)="setActive(item)"  [activated]="activeItem === item" [ngClass]="activeItem === item ? 'active' : ''">
+        <mat-list-item (click)="setActive(item)" [activated]="activeItem === item"
+                       [ngClass]="activeItem === item ? 'active' : ''">
           <psk-chat-item [id]="item"></psk-chat-item>
         </mat-list-item>
       }
-    </mat-selection-list>
+    </mat-nav-list>
   </mat-tab>
   <mat-tab label="Сгруппированные">
     <mat-selection-list>
@@ -38,5 +40,3 @@
 <button class="btn-create-chat" color="primary" mat-fab matTooltip="Новый чат">
   <mat-icon>create</mat-icon>
 </button>
-
-
