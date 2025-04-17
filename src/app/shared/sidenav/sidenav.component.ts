@@ -3,7 +3,7 @@ import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/mat
 import { SidenavService } from './sidenav.service';
 import { RouterOutlet } from '@angular/router';
 import { ChatsComponent } from '../../user/components/chats/chats.component';
-import { ChatsServiceService } from '../../user/components/chats/chats.service.service';
+import { ChatsService } from '../../user/components/chats/chats.service';
 
 @Component({
   selector: 'psk-sidenav',
@@ -19,7 +19,7 @@ import { ChatsServiceService } from '../../user/components/chats/chats.service.s
 })
 export class SidenavComponent implements OnInit, OnDestroy {
   protected sidenavService = inject(SidenavService);
-  private chatsService = inject(ChatsServiceService);
+  private chatsService = inject(ChatsService);
 
   @HostListener('window:resize', ['$event'])
   public onResize(event: Event) {

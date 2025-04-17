@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ChatItemComponent } from '../chat-item/chat-item.component';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
@@ -8,9 +8,10 @@ import { MatFabButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { NgClass } from '@angular/common';
-import { ChatsServiceService } from './chats.service.service';
+import { ChatsService } from './chats.service';
 import { Router } from '@angular/router';
 import { SidenavService } from '../../../shared/sidenav/sidenav.service';
+import { Chat } from '../../mocks/interfaces/chat';
 
 @Component({
   selector: 'psk-chats',
@@ -37,19 +38,24 @@ import { SidenavService } from '../../../shared/sidenav/sidenav.service';
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
-export class ChatsComponent {
-  public items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  protected activeItem?: number;
+export class ChatsComponent implements OnInit {
+  public chats: Chat[] = [];
+  protected activeChat?: number;
   private sidenavService = inject(SidenavService);
-  private chatsService = inject(ChatsServiceService);
+  private chatsService = inject(ChatsService);
   private router = inject(Router);
 
-  public setActive(item: number) {
+  public ngOnInit() {
+    this.chatsService.getChats()
+      .subscribe(chats => this.chats = chats);
+  }
+
+  public setActive(chatId: number) {
     if (window.innerWidth <= 600) {
       this.sidenavService.isSidenavOpened = signal(false);
     }
-    this.activeItem = item;
+    this.activeChat = chatId;
     this.chatsService.isActiveChat = signal(true);
-    this.router.navigate(['/chats', this.activeItem]);
+    this.router.navigate(['/chats', this.activeChat]);
   }
 }

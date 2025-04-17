@@ -19,19 +19,20 @@
 <mat-tab-group>
   <mat-tab label="Все">
     <mat-nav-list>
-      @for (item of items; track item) {
-        <mat-list-item (click)="setActive(item)" [activated]="activeItem === item"
-                       [ngClass]="activeItem === item ? 'active' : ''">
-          <psk-chat-item [id]="item"></psk-chat-item>
+      @for (chat of chats; track chat.id) {
+        <mat-list-item (click)="setActive(chat.id)" [activated]="activeChat === chat.id"
+                       [ngClass]="activeChat === chat.id ? 'active' : ''">
+          <psk-chat-item [chat]="chat"></psk-chat-item>
         </mat-list-item>
       }
     </mat-nav-list>
   </mat-tab>
   <mat-tab label="Сгруппированные">
     <mat-selection-list>
-      @for (item of items; track item) {
-        <mat-list-item>
-          <psk-chat-item></psk-chat-item>
+      @for (chat of chats; track chat) {
+        <mat-list-item (click)="setActive(chat.id)" [activated]="activeChat === chat.id"
+                       [ngClass]="activeChat === chat.id ? 'active' : ''">
+          <psk-chat-item [chat]="chat"></psk-chat-item>
         </mat-list-item>
       }
     </mat-selection-list>

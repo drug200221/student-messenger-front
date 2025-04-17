@@ -7,7 +7,7 @@ import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
 import { MatCard, MatCardContent, MatCardFooter } from '@angular/material/card';
 import { SidenavService } from '../../../shared/sidenav/sidenav.service';
 import { Router } from '@angular/router';
-import { ChatsServiceService } from '../chats/chats.service.service';
+import { ChatsService } from '../chats/chats.service';
 
 @Component({
   selector: 'psk-message-area',
@@ -31,7 +31,7 @@ import { ChatsServiceService } from '../chats/chats.service.service';
 })
 export class MessageAreaComponent {
   protected sidenavService = inject(SidenavService);
-  private chatsService = inject(ChatsServiceService);
+  private chatsService = inject(ChatsService);
   private router = inject(Router);
 
   protected goBack() {

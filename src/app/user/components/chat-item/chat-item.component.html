@@ -1,24 +1,24 @@
 <div class="dialog">
   <div class="avatar">
     <img alt="" src="">
-    ФИ
+    {{ this.getLetters(chat.title) }}
   </div>
   <div class="column">
     <div class="row">
       <div class="dialog-title">
-        <b>Фамилия Имя Отчество {{ id }}</b>
+        <b>{{ chat.title }}</b>
       </div>
       <div class="message-info">
         <span class="message-status">
           <mat-icon color="primary">check</mat-icon>
           <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
         </span>
-        <span class="message-time">10:10</span>
+        <span class="message-time">{{ this.getDateMessage(chat.lastMessage.dateTime) }}</span>
       </div>
     </div>
     <div class="row">
       <div class="subtitle">
-        Очень длинное последнее сообщение
+        {{ chat.lastMessage.text }}
       </div>
     </div>
   </div>
