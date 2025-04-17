@@ -3,6 +3,7 @@ import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/mat
 import { SidenavService } from './sidenav.service';
 import { RouterOutlet } from '@angular/router';
 import { ChatsComponent } from '../../user/components/chats/chats.component';
+import { ChatsServiceService } from '../../user/components/chats/chats.service.service';
 
 @Component({
   selector: 'psk-sidenav',
@@ -18,6 +19,7 @@ import { ChatsComponent } from '../../user/components/chats/chats.component';
 })
 export class SidenavComponent implements OnInit, OnDestroy {
   protected sidenavService = inject(SidenavService);
+  private chatsService = inject(ChatsServiceService);
 
   @HostListener('window:resize', ['$event'])
   public onResize(event: Event) {
@@ -26,8 +28,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
       this.sidenavService.isSidenavOpened = signal(true);
     } else if (this.sidenavService.isSidenavOpened()) {
       if (target.innerWidth <= 920) {
-        if (target.innerWidth <= 600) {
-          this.sidenavService.isSidenavOpened = signal(true);
+        if (target.innerWidth <= 600 && this.chatsService.isActiveChat()) {
+          this.sidenavService.isSidenavOpened = signal(false);
         } else {
           this.sidenavService.isSidenavOpened = signal(true);
         }

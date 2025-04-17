@@ -1,4 +1,4 @@
-<div [routerLink]="[id]" class="dialog">
+<div class="dialog">
   <div class="avatar">
     <img alt="" src="">
     ФИ
@@ -6,7 +6,7 @@
   <div class="column">
     <div class="row">
       <div class="dialog-title">
-        <b>Фамилия Имя Отчество lllllllllllllll</b>
+        <b>Фамилия Имя Отчество {{ id }}</b>
       </div>
       <div class="message-info">
         <span class="message-status">
@@ -16,8 +16,10 @@
         <span class="message-time">10:10</span>
       </div>
     </div>
-    <div class="subtitle">
-      Очень длинное последнее сообщение
+    <div class="row">
+      <div class="subtitle">
+        Очень длинное последнее сообщение
+      </div>
     </div>
   </div>
 </div>

@@ -5,8 +5,9 @@
 
   mat-toolbar {
     background-color: white;
-    height: 55px;
+    height: 56px;
     justify-content: space-between;
+    overflow: hidden;
 
     .btn-back {
       display: none;
@@ -23,7 +24,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1em;
         border-radius: 50%;
         background-color: green;
         color: white;
@@ -43,30 +43,19 @@
         flex-direction: column;
         overflow: hidden;
         margin-left: 16px;
-        width: 100%;
 
-        .top {
-          display: flex;
+        .user-title {
           overflow: hidden;
-
-          .user-title {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 0.9em;
-          }
+          text-overflow: ellipsis;
+          font-size: 0.9em;
         }
 
-        .bottom {
-          display: flex;
+        .info {
           overflow: hidden;
-
-          .info {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 0.8em;
-            line-height: 1;
-            margin-bottom: 4px;
-          }
+          text-overflow: ellipsis;
+          font-size: 0.8em;
+          line-height: 1;
+          margin-bottom: 4px;
         }
       }
     }
@@ -75,7 +64,7 @@
   .messages {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 55px);
+    height: calc(100% - 56px);
     margin: 0 auto;
     max-width: 640px;
     width: 100%;

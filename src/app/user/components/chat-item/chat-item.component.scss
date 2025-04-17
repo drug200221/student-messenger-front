@@ -1,7 +1,5 @@
 .dialog {
   display: flex;
-  flex-flow: row nowrap;
-  width: 100%;
 
   .avatar {
     position: relative;
@@ -26,29 +24,30 @@
   }
 
   .column {
+    flex: 1;
+    overflow: hidden;
     margin-left: 16px;
-    width: 100%;
 
     .row {
       display: flex;
+      overflow: hidden;
       justify-content: space-between;
       align-items: center;
 
       .dialog-title {
-        margin-right: 0;
-        width: 75%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .subtitle {
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
       .message-info {
-        width: 80px;
         display: flex;
-        margin-left: 8px;
-        margin-right: 10%;
 
         .message-status {
-          margin-left: auto;
           position: relative;
 
           mat-icon {
@@ -67,12 +66,7 @@
           margin-left: 4px;
         }
       }
-    }
 
-    .subtitle {
-      width: 85%;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
   }
 }

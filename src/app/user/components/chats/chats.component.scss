@@ -7,8 +7,12 @@
   }
 }
 
-mat-list-item {
-  height: 72px !important;
+mat-tab-group {
+  height: calc(100% - 56px);
+
+  mat-list-item {
+    height: 72px !important;
+  }
 }
 
 .active {
@@ -20,10 +24,6 @@ mat-list-item {
   position: absolute;
   bottom: 20px;
   right: 20px;
-}
-
-mat-tab-group {
-  height: calc(100vh - 55px);
 }
 
 

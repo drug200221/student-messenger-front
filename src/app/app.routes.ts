@@ -8,7 +8,6 @@ export const routes: Routes = [
     component: SidenavComponent,
     children: [
       { path: ':chatId', component: MessageAreaComponent },
-      { path: '', component: MessageAreaComponent },
     ],
   },
 ];

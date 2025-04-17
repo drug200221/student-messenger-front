@@ -1,13 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
-import { MatTooltip } from '@angular/material/tooltip';
 import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
 import { MatCard, MatCardContent, MatCardFooter } from '@angular/material/card';
 import { SidenavService } from '../../../shared/sidenav/sidenav.service';
 import { Router } from '@angular/router';
+import { ChatsServiceService } from '../chats/chats.service.service';
 
 @Component({
   selector: 'psk-message-area',
@@ -18,7 +18,6 @@ import { Router } from '@angular/router';
     MatMenuTrigger,
     MatMenu,
     MatMenuItem,
-    MatTooltip,
     MatFormField,
     MatInput,
     MatSuffix,
@@ -32,11 +31,14 @@ import { Router } from '@angular/router';
 })
 export class MessageAreaComponent {
   protected sidenavService = inject(SidenavService);
-  protected readonly console = console;
+  private chatsService = inject(ChatsServiceService);
   private router = inject(Router);
 
   protected goBack() {
     this.sidenavService.toggleSidenav();
-    this.router.navigate(['/chats']);
+    if (window.innerWidth <= 600) {
+      this.chatsService.isActiveChat = signal(false);
+      this.router.navigate(['/chats']);
+    }
   }
 }
