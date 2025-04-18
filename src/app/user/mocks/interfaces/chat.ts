@@ -1,3 +1,9 @@
+export interface DateTime {
+  date: string;
+  timezone_type: number;
+  timezone: string;
+}
+
 export interface Sender {
   id: number;
   name: string;
@@ -6,7 +12,7 @@ export interface Sender {
 export interface LastMessage {
   id: number;
   text: string;
-  dateTime: Date;
+  dateTime: DateTime,
   sender: Sender;
 }
 
