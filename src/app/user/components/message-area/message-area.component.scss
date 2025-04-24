@@ -120,7 +120,13 @@
             }
 
             mat-icon {
-              font-size: 1.3em;
+              font-size: 1.3em !important;
+            }
+          }
+
+          .icon {
+            mat-icon {
+              font-size: 1.1em;
               height: 14px;
             }
           }
