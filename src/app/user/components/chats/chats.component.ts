@@ -3,7 +3,7 @@ import { ChatItemComponent } from '../chat-item/chat-item.component';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
-import { MatListItem, MatNavList, MatSelectionList } from '@angular/material/list';
+import { MatListItem, MatNavList } from '@angular/material/list';
 import { MatFabButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
@@ -11,7 +11,7 @@ import { NgClass } from '@angular/common';
 import { ChatsService } from './chats.service';
 import { Router } from '@angular/router';
 import { SidenavService } from '../../../shared/sidenav/sidenav.service';
-import { Chat } from '../../mocks/interfaces/chat';
+import { Chat, Contact } from './user-chats-and-contacts';
 
 @Component({
   selector: 'psk-chats',
@@ -24,7 +24,6 @@ import { Chat } from '../../mocks/interfaces/chat';
     MatInput,
     MatFormField,
     MatSuffix,
-    MatSelectionList,
     MatListItem,
     MatFabButton,
     MatTooltip,
@@ -40,14 +39,20 @@ import { Chat } from '../../mocks/interfaces/chat';
 })
 export class ChatsComponent implements OnInit {
   public chats: Chat[] = [];
+  public contacts: Contact[] = [];
   protected activeChat?: number;
   private sidenavService = inject(SidenavService);
   private chatsService = inject(ChatsService);
   private router = inject(Router);
 
   public ngOnInit() {
-    this.chatsService.getChats()
-      .subscribe(chats => this.chats = chats);
+    console.log(1);
+    this.chatsService.getChatsAndContacts().subscribe(
+      user => {
+        this.contacts = user!.contacts;
+        this.chats = user!.chats;
+      }
+    );
   }
 
   public setActive(chatId: number) {

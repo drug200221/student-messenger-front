@@ -4,10 +4,10 @@ import { MessageAreaComponent } from './user/components/message-area/message-are
 
 export const routes: Routes = [
   {
-    path: 'chats',
+    path: '',
     component: SidenavComponent,
     children: [
-      { path: ':chatId', component: MessageAreaComponent },
+      { path: 'chats/:chatId', component: MessageAreaComponent },
     ],
   },
 ];

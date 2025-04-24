@@ -1,7 +1,9 @@
-import { Injectable, signal } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Chat } from '../../mocks/interfaces/chat';
-import { mockChats } from '../../mocks/models/mock.chats';
+import { inject, Injectable, signal } from '@angular/core';
+import { BehaviorSubject, catchError, map, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { IApiResponse } from '../../../core/interfaces/api-response';
+import { Chat, Contact, User } from './user-chats-and-contacts';
+import { env } from '../../../../env/env';
 
 @Injectable({
   providedIn: 'root',
@@ -9,9 +11,21 @@ import { mockChats } from '../../mocks/models/mock.chats';
 export class ChatsService {
   public isActiveChat = signal(false);
   public $chats = new BehaviorSubject<Chat[]>([]);
+  public $contacts = new BehaviorSubject<Contact[]>([]);
+  private http = inject(HttpClient);
 
-  public getChats(): Observable<Chat[]> {
-    this.$chats.next(mockChats);
-    return this.$chats;
+  public getChatsAndContacts() {
+    return this.http.get<IApiResponse<User>>(`${env.baseApiUrl}`).pipe(
+      map((response) => {
+        this.$chats.next(response.result!.chats);
+        this.$contacts.next(response.result!.contacts);
+
+        return response.result;
+      }),
+      catchError((error) => {
+        console.log(error);
+        return of();
+      })
+    );
   }
 }

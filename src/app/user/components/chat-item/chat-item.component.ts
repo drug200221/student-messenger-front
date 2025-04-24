@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { Chat, DateTime } from '../../mocks/interfaces/chat';
+import { Chat, DateTime } from '../chats/user-chats-and-contacts';
 
 @Component({
   selector: 'psk-chat-item',
