@@ -19,10 +19,10 @@
 <mat-tab-group>
   <mat-tab label="Все">
     <mat-nav-list>
-      @for (chat of chats; track chat.chatId) {
-        <mat-list-item (click)="setActive(chat.chatId)" [activated]="activeChat === chat.chatId"
-                       [ngClass]="activeChat === chat.chatId ? 'active' : ''">
-          <psk-chat-item [chat]="chat"></psk-chat-item>
+      @for (c of contactsAndChats; track c.id) {
+        <mat-list-item (click)="setActive(c)" [activated]="activeC === c.id && this.chatsService.isActiveChat()"
+                       [ngClass]="activeC === c.id && this.chatsService.isActiveChat() ? 'active' : ''">
+          <psk-chat-item [c]="c"></psk-chat-item>
         </mat-list-item>
       }
     </mat-nav-list>

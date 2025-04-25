@@ -4,53 +4,59 @@ interface DateTime {
   timezone: string;
 }
 
-interface Message {
-  id: number;
+interface ContactMessage {
+  chatId: null;
   senderId: number;
-  recipientId: number;
   messageId: number;
   replyMessageId: number | null;
   text: string;
   status: number;
   date: DateTime;
+  deletedBySender: boolean;
+  deletedByRecipient: boolean;
+  isEdited: boolean;
   fileId: number | null;
-}
-
-interface ContactInfo {
-  id: number;
-  lastName: string;
-  firstName: string;
-  middleName: string;
-  fullName: string;
 }
 
 interface Contact {
   id: number;
-  contact: ContactInfo;
-  isArchived: boolean;
-  notify: boolean;
-  lastMessage: Message;
-}
-
-interface Chat {
-  userId: number;
-  chatId: number;
-  title: string;
-  description: string;
+  fullName: string;
   color: string;
   isArchived: boolean;
   notify: boolean;
-  lastMessage: Message;
+  lastMessage: ContactMessage;
+}
+
+interface ChatMessage {
+  senderId: null;
+  chatId: number;
+  messageId: number;
+  replyMessageId: number | null;
+  text: string;
+  status: number;
+  date: DateTime;
+  deletedBySender: boolean;
+  deletedByRecipient: boolean;
+  isEdited: boolean;
+  fileId: number | null;
+}
+
+interface Chat {
+  id: number;
+  title: string;
+  description: string | null;
+  color: string;
+  isArchived: boolean;
+  notify: boolean;
+  lastMessage: ChatMessage;
 }
 
 interface User {
   id: number;
-  lastName: string;
-  firstName: string;
-  middleName: string;
   fullName: string;
+  color: string;
   contacts: Contact[];
   chats: Chat[];
 }
 
-export { User, Contact, Chat, Message, DateTime };
+export { User, Contact, ContactMessage, Chat, ChatMessage, Message, DateTime };

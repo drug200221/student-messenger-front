@@ -1,17 +1,22 @@
 import { Component, Input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { Chat, DateTime } from '../chats/user-chats-and-contacts';
+import { DateTime } from '../chats/user-chats-and-contacts';
+import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
+import { NgClass } from '@angular/common';
+import { getLetters } from '../../../shared/utils/getLetters';
 
 @Component({
   selector: 'psk-chat-item',
   imports: [
     MatIcon,
+    NgClass,
   ],
   templateUrl: './chat-item.component.html',
   styleUrl: './chat-item.component.scss',
 })
 export class ChatItemComponent {
-  @Input() public chat!: Chat;
+  @Input() public c!: CombinedContactsAndChats;
+  protected readonly getLetters = getLetters;
 
   protected getDateMessage(dateTime: DateTime): string {
     const localDateTime = new Date(dateTime.date + `GMT+${dateTime.timezone_type}`);
@@ -60,17 +65,6 @@ export class ChatItemComponent {
       } else {
         return monthDay;
       }
-    }
-  }
-
-  protected getLetters(title: string) {
-    const letters = title.split(' ');
-    if (letters.length === 1) {
-      return letters[0].substring(0, 2).toUpperCase();
-    } else {
-      const l = letters.slice(0, 2).map(letter =>
-        letter.charAt(0).toUpperCase());
-      return l.join('');
     }
   }
 }

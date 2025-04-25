@@ -8,6 +8,7 @@ export const routes: Routes = [
     component: SidenavComponent,
     children: [
       { path: 'chats/:chatId', component: MessageAreaComponent },
+      { path: 'contacts/:contactId', component: MessageAreaComponent },
     ],
   },
 ];

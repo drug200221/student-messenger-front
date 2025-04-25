@@ -11,6 +11,7 @@ import { NgClass } from '@angular/common';
 import { ChatsService } from './chats.service';
 import { Router } from '@angular/router';
 import { SidenavService } from '../../../shared/sidenav/sidenav.service';
+import { CombinedContactsAndChats } from './combine-and-sort.messages';
 import { Chat, Contact } from './user-chats-and-contacts';
 
 @Component({
@@ -38,29 +39,29 @@ import { Chat, Contact } from './user-chats-and-contacts';
   styleUrl: './chats.component.scss',
 })
 export class ChatsComponent implements OnInit {
-  public chats: Chat[] = [];
-  public contacts: Contact[] = [];
-  protected activeChat?: number;
+  public contactsAndChats: CombinedContactsAndChats[] = [];
+  protected activeC?: number;
+  protected chatsService = inject(ChatsService);
   private sidenavService = inject(SidenavService);
-  private chatsService = inject(ChatsService);
   private router = inject(Router);
 
   public ngOnInit() {
-    console.log(1);
     this.chatsService.getChatsAndContacts().subscribe(
-      user => {
-        this.contacts = user!.contacts;
-        this.chats = user!.chats;
-      }
+      contactsAndChats => this.contactsAndChats = contactsAndChats
     );
   }
 
-  public setActive(chatId: number) {
+  public setActive(c: Contact & { type: string } | Chat & { type: string }) {
     if (window.innerWidth <= 600) {
       this.sidenavService.isSidenavOpened = signal(false);
     }
-    this.activeChat = chatId;
+    this.activeC = c.id;
     this.chatsService.isActiveChat = signal(true);
-    this.router.navigate(['/chats', this.activeChat]);
+    if (c.type === 'contact') {
+      this.router.navigate(['/contacts', this.activeC]);
+    } else if (c.type === 'chat') {
+      this.router.navigate(['/chats', this.activeC]);
+    }
+
   }
 }

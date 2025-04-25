@@ -18,6 +18,35 @@
       overflow: hidden;
       align-items: center;
 
+      .blue {
+        background-color: blue !important;
+      }
+
+      .red {
+        background-color: red !important;
+      }
+
+      .green {
+        background-color: green !important;
+      }
+
+      .yellow {
+        background-color: yellow !important;
+      }
+
+      .orange {
+        background-color: orange !important;
+      }
+
+      .pink {
+        background-color: pink !important;
+      }
+
+      .purple {
+        background-color: purple !important;
+      }
+
+
       .avatar {
         min-width: 42px;
         min-height: 42px;
@@ -74,6 +103,15 @@
       flex-direction: column;
       height: 100%;
       overflow: auto;
+
+      .date-divider {
+        text-align: center;
+        font-size: 14px;
+        color: #888;
+        padding: 8px 0;
+        border-top: 1px solid #e0e0e0;
+        margin: 16px 0;
+      }
 
       .recipient {
         display: flex;

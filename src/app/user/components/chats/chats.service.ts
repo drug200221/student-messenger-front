@@ -1,26 +1,24 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { BehaviorSubject, catchError, map, of } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { IApiResponse } from '../../../core/interfaces/api-response';
-import { Chat, Contact, User } from './user-chats-and-contacts';
 import { env } from '../../../../env/env';
+import { User } from './user-chats-and-contacts';
+import { combineAndSortMessages, CombinedContactsAndChats } from './combine-and-sort.messages';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatsService {
   public isActiveChat = signal(false);
-  public $chats = new BehaviorSubject<Chat[]>([]);
-  public $contacts = new BehaviorSubject<Contact[]>([]);
+  public $contactsAndChats = new BehaviorSubject<CombinedContactsAndChats[]>([]);
   private http = inject(HttpClient);
 
-  public getChatsAndContacts() {
+  public getChatsAndContacts(): Observable<CombinedContactsAndChats[]> {
     return this.http.get<IApiResponse<User>>(`${env.baseApiUrl}`).pipe(
       map((response) => {
-        this.$chats.next(response.result!.chats);
-        this.$contacts.next(response.result!.contacts);
-
-        return response.result;
+        this.$contactsAndChats.next(combineAndSortMessages(response.result!));
+        return combineAndSortMessages(response.result!);
       }),
       catchError((error) => {
         console.log(error);

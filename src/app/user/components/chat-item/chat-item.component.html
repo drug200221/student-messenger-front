@@ -1,24 +1,24 @@
 <div class="dialog">
-  <div class="avatar">
+  <div [ngClass]="c.color.toLowerCase()" class="avatar">
     <img alt="" src="">
-    {{ this.getLetters(chat.title) }}
+    {{ c.type === "contact" ? getLetters(c.fullName!) : this.getLetters(c.title!) }}
   </div>
   <div class="column">
     <div class="row">
       <div class="dialog-title">
-        <b>{{ chat.title }}</b>
+        <b>{{ c.type === "contact" ? c.fullName! : c.title! }}</b>
       </div>
       <div class="message-info">
         <span class="message-status">
           <mat-icon color="primary">check</mat-icon>
           <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
         </span>
-        <span class="message-time">{{ this.getDateMessage(chat.lastMessage.date) }}</span>
+        <span class="message-time">{{ this.getDateMessage(c.lastMessage.date) }}</span>
       </div>
     </div>
     <div class="row">
       <div class="subtitle">
-        {{ chat.lastMessage.text }}
+        {{ c.lastMessage.text }}
       </div>
     </div>
   </div>
