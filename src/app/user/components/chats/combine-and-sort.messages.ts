@@ -1,8 +1,6 @@
-import {Chat, Contact, User} from './user-chats-and-contacts';
+import {ContactOrChat, User} from './user-chats-and-contacts';
 
-export type CombinedContactsAndChats = (Contact | Chat) & {
-  fullName?: string;
-  title?: string;
+export type CombinedContactsAndChats = (ContactOrChat) & {
   type: 'contact' | 'chat'
 };
 

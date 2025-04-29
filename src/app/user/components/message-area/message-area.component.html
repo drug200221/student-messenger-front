@@ -30,15 +30,13 @@
         </mat-menu>
       </div>
     </mat-toolbar>
-
     <div class="messages">
-      <div class="message-display">
+      <div [scrollTop]="-101111" #messageDisplay class="message-display">
         @for (message of messages; track $index) {
           <div *ngIf="shouldDisplayDate($index, messages)" class="date-divider">
             {{ getDateLabel(message.date.date) }}
           </div>
-
-          @if (message.senderId === c.id || message.chatId === c.id) {
+          @if (message.recipientId === c.id || message.chatId === c.id) {
             <div class="sender">
               <mat-card>
                 <mat-card-content>{{ message.text }}</mat-card-content>

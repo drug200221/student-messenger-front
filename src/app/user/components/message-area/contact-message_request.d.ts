@@ -1,6 +1,6 @@
 export interface IContactMessageRequest {
   id?: number,
-  senderId: number,
+  recipientId: number,
   text: string,
   replyMessageId?: number,
   fileId?: number,

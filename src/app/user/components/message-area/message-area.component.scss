@@ -93,16 +93,15 @@
   .messages {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 56px);
+    height: calc(100% - 58px);
     margin: 0 auto;
+    padding-top: 4px;
     max-width: 640px;
     width: 100%;
 
     .message-display {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow: auto;
+      flex: 1;
+      overflow-y: auto;
 
       .date-divider {
         text-align: center;
@@ -114,14 +113,14 @@
       }
 
       .recipient {
-        display: flex;
-        justify-content: right;
-      }
-
-      .sender {
         mat-card {
           background-color: rgb(225, 227, 239);
         }
+      }
+
+      .sender {
+        display: flex;
+        justify-content: right;
       }
 
       mat-card {

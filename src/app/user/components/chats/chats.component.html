@@ -19,7 +19,7 @@
 <mat-tab-group>
   <mat-tab label="Все">
     <mat-nav-list>
-      @for (c of contactsAndChats; track c.id) {
+      @for (c of contactsAndChats; track c) {
         <mat-list-item (click)="setActive(c)" [activated]="activeC === c.id && this.chatsService.isActiveChat()"
                        [ngClass]="activeC === c.id && this.chatsService.isActiveChat() ? 'active' : ''">
           <psk-chat-item [c]="c"></psk-chat-item>
@@ -27,16 +27,6 @@
       }
     </mat-nav-list>
   </mat-tab>
-  <!--  <mat-tab label="Сгруппированные">-->
-  <!--    <mat-selection-list>-->
-  <!--      @for (chat of chats; track chat) {-->
-  <!--        <mat-list-item (click)="setActive(chat.id)" [activated]="activeChat === chat.id"-->
-  <!--                       [ngClass]="activeChat === chat.id ? 'active' : ''">-->
-  <!--          <psk-chat-item [chat]="chat"></psk-chat-item>-->
-  <!--        </mat-list-item>-->
-  <!--      }-->
-  <!--    </mat-selection-list>-->
-  <!--  </mat-tab>-->
 </mat-tab-group>
 <button class="btn-create-chat" color="primary" mat-fab matTooltip="Новый чат">
   <mat-icon>create</mat-icon>

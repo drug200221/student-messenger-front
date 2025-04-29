@@ -1,23 +1,28 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { IApiResponse } from '../../../core/interfaces/api-response';
-import { BehaviorSubject, catchError, map, of } from 'rxjs';
-import { ChatMessage, ContactMessage } from '../chats/user-chats-and-contacts';
+import { BehaviorSubject, catchError, map, of, tap } from 'rxjs';
+import { ContactOrChatMessage } from '../chats/user-chats-and-contacts';
 import { env } from '../../../../env/env';
 import { IContactMessageRequest } from './contact-message_request';
+import { SocketService } from '../../services/socket.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
-  public $messages = new BehaviorSubject<ContactMessage[] | ChatMessage[]>([]);
+  public $messages = new BehaviorSubject<ContactOrChatMessage[]>([]);
+  private socketService = inject(SocketService);
   private http = inject(HttpClient);
 
   public getMessages(params: HttpParams) {
-    return this.http.get<IApiResponse<ContactMessage[] | ChatMessage[]>>(`${env.baseApiUrl}/chat-contact/`, { params }).pipe(
+    return this.http.get<IApiResponse<ContactOrChatMessage[]>>(`${env.baseApiUrl}/chat-contact/`, { params }).pipe(
       map((response) => {
-        this.$messages.next(response.result!);
-        return response.result!;
+        if (response.result) {
+          this.$messages.next(response.result);
+          return response.result;
+        }
+        return [];
       }),
       catchError((error) => {
         console.log(error);
@@ -27,7 +32,13 @@ export class MessageService {
   }
 
   public send(request: IContactMessageRequest) {
-    return this.http.post<IApiResponse<ContactMessage[] | ChatMessage[]>>(`${env.baseApiUrl}/chat-contact/`, request).pipe(
+    return this.http.post<IApiResponse<ContactOrChatMessage>>(`${env.baseApiUrl}/chat-contact/`, request).pipe(
+      tap(response => {
+        if (response.result) {
+          this.$messages.value.push(response.result);
+          this.socketService.sendMessage(response.result);
+        }
+      }),
       catchError((error) => {
         console.log(error);
         return of();

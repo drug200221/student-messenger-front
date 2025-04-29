@@ -12,7 +12,6 @@ import { ChatsService } from './chats.service';
 import { Router } from '@angular/router';
 import { SidenavService } from '../../../shared/sidenav/sidenav.service';
 import { CombinedContactsAndChats } from './combine-and-sort.messages';
-import { Chat, Contact } from './user-chats-and-contacts';
 
 @Component({
   selector: 'psk-chats',
@@ -51,7 +50,7 @@ export class ChatsComponent implements OnInit {
     );
   }
 
-  public setActive(c: Contact & { type: string } | Chat & { type: string }) {
+  public setActive(c: CombinedContactsAndChats) {
     if (window.innerWidth <= 600) {
       this.sidenavService.isSidenavOpened = signal(false);
     }
@@ -62,6 +61,5 @@ export class ChatsComponent implements OnInit {
     } else if (c.type === 'chat') {
       this.router.navigate(['/chats', this.activeC]);
     }
-
   }
 }

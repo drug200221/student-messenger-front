@@ -17,8 +17,11 @@ export class ChatsService {
   public getChatsAndContacts(): Observable<CombinedContactsAndChats[]> {
     return this.http.get<IApiResponse<User>>(`${env.baseApiUrl}`).pipe(
       map((response) => {
-        this.$contactsAndChats.next(combineAndSortMessages(response.result!));
-        return combineAndSortMessages(response.result!);
+        if (response.result) {
+          this.$contactsAndChats.next(combineAndSortMessages(response.result!));
+          return combineAndSortMessages(response.result!);
+        }
+        return [];
       }),
       catchError((error) => {
         console.log(error);
