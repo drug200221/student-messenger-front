@@ -75,12 +75,14 @@
 
       .message-info {
         display: flex;
+        align-items: start;
 
         .message-status {
           position: relative;
+          top: 3px;
 
           mat-icon {
-            font-size: 1.3em;
+            font-size: 1.2em;
           }
 
           .overlapping-icon {
@@ -91,8 +93,8 @@
         }
 
         .message-time {
-          font-size: 0.9em;
-          margin-left: 4px;
+          font-size: 0.85em;
+          margin-left: 2px;
         }
       }
 

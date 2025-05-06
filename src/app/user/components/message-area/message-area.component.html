@@ -32,8 +32,8 @@
     </mat-toolbar>
     <div class="messages">
       <div [scrollTop]="-101111" #messageDisplay class="message-display">
-        @for (message of messages; track $index) {
-          <div *ngIf="shouldDisplayDate($index, messages)" class="date-divider">
+        @for (message of c.messages; track message.messageId) {
+          <div *ngIf="shouldDisplayDate($index, c.messages)" class="date-divider">
             {{ getDateLabel(message.date.date) }}
           </div>
           @if (message.recipientId === c.id || message.chatId === c.id) {
@@ -68,16 +68,31 @@
           }
         }
       </div>
-      <form (ngSubmit)="send()" class="message-input" [formGroup]="messageForm">
-        <mat-form-field>
-          <input formControlName="text" matInput placeholder="Сообщение">
-          <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-          <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
-        </mat-form-field>
-        <button [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
-          <mat-icon>send</mat-icon>
-        </button>
-      </form>
+      @if (c.type === 'contact') {
+        <form (ngSubmit)="sendInContact()" class="message-input"
+              [formGroup]="contactMessageForm!">
+          <mat-form-field>
+            <input formControlName="text" matInput placeholder="Сообщение">
+            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+            <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
+          </mat-form-field>
+          <button [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
+            <mat-icon>send</mat-icon>
+          </button>
+        </form>
+      } @else if (c.type === 'chat') {
+        <form (ngSubmit)="sendInChat()" class="message-input"
+              [formGroup]="chatMessageForm!">
+          <mat-form-field>
+            <input formControlName="text" matInput placeholder="Сообщение">
+            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+            <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
+          </mat-form-field>
+          <button [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
+            <mat-icon>send</mat-icon>
+          </button>
+        </form>
+      }
     </div>
   </div>
 }

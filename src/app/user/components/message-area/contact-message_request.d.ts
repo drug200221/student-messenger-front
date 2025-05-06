@@ -1,6 +1,7 @@
-export interface IContactMessageRequest {
+export interface IMessageRequest {
   id?: number,
-  recipientId: number,
+  chatId?: number; // для чата
+  recipientId?: number; // для контакта
   text: string,
   replyMessageId?: number,
   fileId?: number,

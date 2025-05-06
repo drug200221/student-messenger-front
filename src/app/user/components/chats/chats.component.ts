@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ChatItemComponent } from '../chat-item/chat-item.component';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
@@ -7,11 +7,11 @@ import { MatListItem, MatNavList } from '@angular/material/list';
 import { MatFabButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
-import { NgClass } from '@angular/common';
-import { ChatsService } from './chats.service';
-import { Router } from '@angular/router';
-import { SidenavService } from '../../../shared/sidenav/sidenav.service';
+import { ChatService } from './chat.service';
 import { CombinedContactsAndChats } from './combine-and-sort.messages';
+import { Subscription } from 'rxjs';
+import { sortContactsAndChats } from '../../../shared/utils/sortContactsAndChats';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'psk-chats',
@@ -31,35 +31,32 @@ import { CombinedContactsAndChats } from './combine-and-sort.messages';
     MatMenu,
     MatMenuItem,
     MatMenuTrigger,
-    NgClass,
     MatNavList,
+    RouterLink,
+    RouterLinkActive,
   ],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
-export class ChatsComponent implements OnInit {
+export class ChatsComponent implements OnInit, OnDestroy {
   public contactsAndChats: CombinedContactsAndChats[] = [];
-  protected activeC?: number;
-  protected chatsService = inject(ChatsService);
-  private sidenavService = inject(SidenavService);
-  private router = inject(Router);
+  protected chatsService = inject(ChatService);
+  private subscription: Subscription = new Subscription();
 
   public ngOnInit() {
-    this.chatsService.getChatsAndContacts().subscribe(
-      contactsAndChats => this.contactsAndChats = contactsAndChats
+    this.subscription.add(
+      this.chatsService.$contactsAndChats.subscribe(contactsAndChats => {
+        if (contactsAndChats.length > 0) {
+          this.contactsAndChats = sortContactsAndChats(contactsAndChats);
+        } else {
+          this.chatsService.getChatsAndContacts().subscribe(loadedContactsAndChats =>
+            this.contactsAndChats = loadedContactsAndChats);
+        }
+      })
     );
   }
 
-  public setActive(c: CombinedContactsAndChats) {
-    if (window.innerWidth <= 600) {
-      this.sidenavService.isSidenavOpened = signal(false);
-    }
-    this.activeC = c.id;
-    this.chatsService.isActiveChat = signal(true);
-    if (c.type === 'contact') {
-      this.router.navigate(['/contacts', this.activeC]);
-    } else if (c.type === 'chat') {
-      this.router.navigate(['/chats', this.activeC]);
-    }
+  public ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 }

@@ -4,9 +4,10 @@ interface DateTime {
   timezone: string;
 }
 
-interface ContactOrChatMessage {
+interface IContactOrChatMessage {
   chatId?: number; // для чата
   recipientId?: number; // для контакта
+  senderId: number;
   messageId: number;
   replyMessageId: number | null;
   text: string;
@@ -18,7 +19,7 @@ interface ContactOrChatMessage {
   isEdited: boolean;
 }
 
-interface ContactOrChat {
+interface IContactOrChat {
   id: number;
   fullName?: string; // для контакта
   title?: string; // для чата
@@ -26,15 +27,16 @@ interface ContactOrChat {
   color: string;
   isArchived: boolean;
   notify: boolean;
-  lastMessage: ContactOrChatMessage;
+  messages: IContactOrChatMessage[];
+  hasNewMessages: boolean;
 }
 
-interface User {
+interface IUser {
   id: number;
   fullName: string;
   color: string;
-  contacts: ContactOrChat[];
-  chats: ContactOrChat[];
+  contacts: IContactOrChat[];
+  chats: IContactOrChat[];
 }
 
-export { User, ContactOrChat, ContactOrChatMessage, DateTime };
+export { IUser, IContactOrChat, IContactOrChatMessage, DateTime };

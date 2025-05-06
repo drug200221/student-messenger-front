@@ -8,17 +8,23 @@
       <div class="dialog-title">
         <b>{{ c.type === "contact" ? c.fullName! : c.title! }}</b>
       </div>
-      <div class="message-info">
+      @if (c.messages[c.messages.length - 1].senderId === this.chatService.$user.value?.id) {
+        <div class="message-info">
         <span class="message-status">
-          <mat-icon color="primary">check</mat-icon>
-          <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
+          @if (c.messages[c.messages.length - 1].status === 1) {
+            <mat-icon color="primary">check</mat-icon>
+            <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
+          } @else {
+            <mat-icon>check</mat-icon>
+          }
         </span>
-        <span class="message-time">{{ this.getDateMessage(c.lastMessage.date) }}</span>
-      </div>
+          <span class="message-time">{{ getDateMessage(c.messages[c.messages.length - 1].date) }}</span>
+        </div>
+      }
     </div>
     <div class="row">
       <div class="subtitle">
-        {{ c.lastMessage.text }}
+        {{ c.messages[c.messages.length - 1].text }}
       </div>
     </div>
   </div>

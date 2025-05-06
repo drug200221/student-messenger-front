@@ -1,4 +1,4 @@
 export const env = {
   baseApiUrl: 'http://localhost:8080/student/messenger/api/v1',
-  wsConnectionUrl: 'ws://localhost:8181',
+  socketConnectionUrl: 'ws://localhost:3000',
 };

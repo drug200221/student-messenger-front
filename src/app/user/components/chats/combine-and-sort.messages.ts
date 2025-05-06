@@ -1,27 +1,23 @@
-import {ContactOrChat, User} from './user-chats-and-contacts';
+import { IContactOrChat, IUser } from './user-chats-and-contacts';
+import { sortContactsAndChats } from '../../../shared/utils/sortContactsAndChats';
 
-export type CombinedContactsAndChats = (ContactOrChat) & {
+export type CombinedContactsAndChats = (IContactOrChat) & {
   type: 'contact' | 'chat'
 };
 
-export function combineAndSortMessages(user: User): CombinedContactsAndChats[] {
-  const contact = user.contacts.map(contact => ({
-    ...contact,
-    type: 'contact' as const,
-  }));
+export function combineAndSortMessages(user: IUser): CombinedContactsAndChats[] {
+  const combinedMessage: CombinedContactsAndChats[] = [
+    ...user.contacts.map(contact => ({
+      ...contact,
+      type: 'contact' as const,
+    })),
+    ...user.chats.map(chat => ({
+      ...chat,
+      type: 'chat' as const,
+    })),
+  ];
 
-  const chat = user.chats.map(chat => ({
-    ...chat,
-    type: 'chat' as const,
-  }));
+  sortContactsAndChats(combinedMessage);
 
-  const combinedMessages: CombinedContactsAndChats[] = [...contact, ...chat];
-
-  combinedMessages.sort((a, b) => {
-    const dateA = new Date(a.lastMessage.date.date).getTime();
-    const dateB = new Date(b.lastMessage.date.date).getTime();
-    return dateA - dateB;
-  });
-
-  return combinedMessages;
+  return combinedMessage;
 }

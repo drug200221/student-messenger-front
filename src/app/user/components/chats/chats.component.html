@@ -19,11 +19,18 @@
 <mat-tab-group>
   <mat-tab label="Все">
     <mat-nav-list>
-      @for (c of contactsAndChats; track c) {
-        <mat-list-item (click)="setActive(c)" [activated]="activeC === c.id && this.chatsService.isActiveChat()"
-                       [ngClass]="activeC === c.id && this.chatsService.isActiveChat() ? 'active' : ''">
-          <psk-chat-item [c]="c"></psk-chat-item>
-        </mat-list-item>
+      @for (c of contactsAndChats; track $index) {
+        @if (c.type === 'contact') {
+          <mat-list-item (click)="this.chatsService.setActive(c)"
+                         [routerLink]="['contacts', c.id]" routerLinkActive="active">
+            <psk-chat-item [c]="c"></psk-chat-item>
+          </mat-list-item>
+        } @else if (c.type === 'chat') {
+          <mat-list-item (click)="this.chatsService.setActive(c)"
+                         [routerLink]="['chats', c.id]" routerLinkActive="active">
+            <psk-chat-item [c]="c"></psk-chat-item>
+          </mat-list-item>
+        }
       }
     </mat-nav-list>
   </mat-tab>
