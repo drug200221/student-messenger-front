@@ -31,12 +31,12 @@
       </div>
     </mat-toolbar>
     <div class="messages">
-      <div [scrollTop]="-101111" #messageDisplay class="message-display">
-        @for (message of c.messages; track message.messageId) {
+      <div #messageDisplay class="message-display">
+        @for (message of c.messages; track $index) {
           <div *ngIf="shouldDisplayDate($index, c.messages)" class="date-divider">
             {{ getDateLabel(message.date.date) }}
           </div>
-          @if (message.recipientId === c.id || message.chatId === c.id) {
+          @if (+message.sender.id === this.chatsService.$user.value?.id) {
             <div class="sender">
               <mat-card>
                 <mat-card-content>{{ message.text }}</mat-card-content>
@@ -57,13 +57,22 @@
               </mat-card>
             </div>
           } @else {
-            <div class="recipient">
-              <mat-card>
-                <mat-card-content>{{ message.text }}</mat-card-content>
-                <mat-card-footer class="info">
-                  <span class="text">{{ message.date.date | date: 'HH:mm' }}</span>
-                </mat-card-footer>
-              </mat-card>
+            <div>
+              <div class="recipient">
+                <div *ngIf="c.type === 'chat'" [ngClass]="message.sender.color" class="avatar">
+                  <img alt="" src=""/>
+                  {{ getLetters(message.sender.fullName) }}
+                </div>
+                <mat-card>
+                  <mat-card-title *ngIf="c.type === 'chat'"
+                                  [ngClass]="'text_' + message.sender.color">{{ message.sender.fullName }}
+                  </mat-card-title>
+                  <mat-card-content>{{ message.text }}</mat-card-content>
+                  <mat-card-footer class="info">
+                    <span class="text">{{ message.date.date | date: 'HH:mm' }}</span>
+                  </mat-card-footer>
+                </mat-card>
+              </div>
             </div>
           }
         }

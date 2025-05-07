@@ -7,7 +7,12 @@ interface DateTime {
 interface IContactOrChatMessage {
   chatId?: number; // для чата
   recipientId?: number; // для контакта
-  senderId: number;
+  sender: {
+    id: number;
+    fullName: string;
+    shortName: string;
+    color: string;
+  };
   messageId: number;
   replyMessageId: number | null;
   text: string;
@@ -28,7 +33,7 @@ interface IContactOrChat {
   isArchived: boolean;
   notify: boolean;
   messages: IContactOrChatMessage[];
-  hasNewMessages: boolean;
+  newMessages: number;
 }
 
 interface IUser {

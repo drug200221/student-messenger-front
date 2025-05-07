@@ -18,35 +18,6 @@
       overflow: hidden;
       align-items: center;
 
-      .blue {
-        background-color: blue !important;
-      }
-
-      .red {
-        background-color: red !important;
-      }
-
-      .green {
-        background-color: green !important;
-      }
-
-      .yellow {
-        background-color: yellow !important;
-      }
-
-      .orange {
-        background-color: orange !important;
-      }
-
-      .pink {
-        background-color: pink !important;
-      }
-
-      .purple {
-        background-color: purple !important;
-      }
-
-
       .avatar {
         min-width: 42px;
         min-height: 42px;
@@ -113,8 +84,34 @@
       }
 
       .recipient {
+        display: flex;
+        align-items: end;
+
+
         mat-card {
           background-color: rgb(225, 227, 239);
+        }
+
+        .avatar {
+          margin-left: 8px;
+          min-width: 42px;
+          min-height: 42px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background-color: green;
+          font-size: 1.5em;
+          color: white;
+
+          img {
+            width: 100%;
+            height: 100%;
+          }
+
+          img:empty {
+            display: none;
+          }
         }
       }
 
@@ -132,6 +129,14 @@
         max-width: 70%;
         width: fit-content;
         overflow-wrap: break-word;
+
+        mat-card-title {
+          font-size: 1.1em;
+          line-height: 2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
 
         mat-card-content {
           padding: 4px;

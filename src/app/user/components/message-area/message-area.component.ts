@@ -4,7 +4,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
-import { MatCard, MatCardContent, MatCardFooter } from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardFooter, MatCardTitle } from '@angular/material/card';
 import { SidenavService } from '../../../shared/sidenav/sidenav.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../chats/chat.service';
@@ -31,6 +31,7 @@ import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
     MatInput,
     MatSuffix,
     MatCard,
+    MatCardTitle,
     MatCardContent,
     MatCardFooter,
     NgClass,
@@ -48,7 +49,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
   protected readonly getDateLabel = getDateLabel;
   protected sidenavService = inject(SidenavService);
   protected c: CombinedContactsAndChats | undefined;
-  private chatsService = inject(ChatService);
+  protected chatsService = inject(ChatService);
   private messageService = inject(MessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
