@@ -9,7 +9,7 @@
         <span>{{ c.type === "contact" ? c.fullName! : c.title! }}</span>
       </div>
       <div class="message-info">
-        @if (c.messages[c.messages.length - 1].sender.id === this.chatService.$user.value?.id) {
+        @if (+c.messages[c.messages.length - 1].sender.id === this.chatService.$user.value?.id) {
           <span class="message-status">
             @if (c.messages[c.messages.length - 1].status === 1) {
               <mat-icon color="primary">check</mat-icon>
@@ -33,11 +33,8 @@
           <span class="last-user">Вы: </span>
         }
         <span>{{ c.messages[c.messages.length - 1].text }}</span>
-
       </div>
       <div class="badge" matBadge="{{ c.newMessages }}"></div>
     </div>
-
   </div>
-
 </div>

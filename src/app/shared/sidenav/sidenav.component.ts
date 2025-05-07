@@ -28,8 +28,12 @@ export class SidenavComponent implements OnInit, OnDestroy {
       this.sidenavService.isSidenavOpened = signal(true);
     } else if (this.sidenavService.isSidenavOpened()) {
       if (target.innerWidth <= 920) {
-        if (target.innerWidth <= 600 && this.chatsService.isActiveChatId() !== -1 && this.chatsService.isActiveContactId() !== -1) {
-          this.sidenavService.isSidenavOpened = signal(false);
+        if (target.innerWidth <= 600) {
+          if (this.chatsService.isActiveChatId() === -1 && this.chatsService.isActiveContactId() === -1) {
+            this.sidenavService.isSidenavOpened = signal(true);
+          } else {
+            this.sidenavService.isSidenavOpened = signal(false);
+          }
         } else {
           this.sidenavService.isSidenavOpened = signal(true);
         }
