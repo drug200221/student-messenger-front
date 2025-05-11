@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { IApiResponse } from '../../../core/interfaces/api-response';
-import { catchError, map, of, tap } from 'rxjs';
-import { IContactOrChatMessage } from '../chats/user-chats-and-contacts';
+import { BehaviorSubject, catchError, map, of, tap } from 'rxjs';
+import { IContactOrChatMessage, IUser } from '../chats/user-chats-and-contacts';
 import { env } from '../../../../env/env';
 import { IMessageRequest } from './contact-message_request';
 import { SocketService } from '../../services/socket.service';
@@ -13,6 +13,7 @@ import { ParamMap } from '@angular/router';
   providedIn: 'root',
 })
 export class MessageService {
+  public $newContact = new BehaviorSubject<IUser | null>(null);
   private socketService = inject(SocketService);
   private chatService = inject(ChatService);
   private http = inject(HttpClient);

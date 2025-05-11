@@ -83,7 +83,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
             this.contactMessageForm.controls.recipientId.setValue(+cId);
             this.chatMessageForm.controls.chatId.setValue(-1);
           }
-          this.c = this.chatsService.$contactsAndChats.value.find(
+          this.c = this.chatsService.$contactsAndChats.value?.find(
             c => c.id === cId && c.type === type
           );
           if (this.c) {
@@ -94,7 +94,21 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
                 this.scrollToBottom();
               });
           } else {
-            this.router.navigate(['/']);
+            const c = this.messageService.$newContact.value;
+            if (c) {
+              this.c = {
+                id: c.id,
+                fullName: c.fullName,
+                color: c.color,
+                isArchived: false,
+                notify: true,
+                messages: [],
+                newMessages: null,
+                type: 'contact',
+              };
+            } else {
+              this.router.navigate(['/']);
+            }
           }
         })
       ).subscribe());

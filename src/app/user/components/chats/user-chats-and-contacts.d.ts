@@ -33,7 +33,7 @@ interface IContactOrChat {
   isArchived: boolean;
   notify: boolean;
   messages: IContactOrChatMessage[];
-  newMessages: number;
+  newMessages: number | null;
 }
 
 interface IUser {

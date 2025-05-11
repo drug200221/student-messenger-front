@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
+import { BehaviorSubject, catchError, map, of, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { IApiResponse } from '../../../core/interfaces/api-response';
 import { env } from '../../../../env/env';
@@ -17,14 +17,25 @@ export class ChatService {
   public $user = new BehaviorSubject<IUser | null>(null);
   public $contacts = new BehaviorSubject<IContactOrChat[]>([]);
   public $chats = new BehaviorSubject<IContactOrChat[]>([]);
-  public $contactsAndChats = new BehaviorSubject<CombinedContactsAndChats[]>([]);
+  public $contactsAndChats = new BehaviorSubject<CombinedContactsAndChats[] | null>(null);
   private socketService = inject(SocketService);
   private sidenavService = inject(SidenavService);
   private http = inject(HttpClient);
 
-  public getChatsAndContacts(): Observable<CombinedContactsAndChats[]> {
+  public search(text: string) {
+    return this.http.get<IApiResponse<IUser[]>>(`${env.baseApiUrl}?search=${text}`).pipe(
+      map(response => {
+        if (response.result) {
+          return response.result;
+        }
+        return [];
+      })
+    );
+  }
+
+  public getChatsAndContacts() {
     return this.http.get<IApiResponse<IUser>>(`${env.baseApiUrl}`).pipe(
-      map((response) => {
+      tap((response) => {
         if (response.result) {
           this.$user.next(response.result);
           this.socketService.connect(`${response.result.id}`);
@@ -32,8 +43,6 @@ export class ChatService {
           this.$contacts.next(response.result.contacts);
           this.$chats.next(response.result.chats);
           this.$contactsAndChats.next(combineAndSortMessages(response.result));
-
-          return combineAndSortMessages(response.result);
         }
         return [];
       }),
@@ -45,7 +54,7 @@ export class ChatService {
   }
 
   public addMessage(message: IContactOrChatMessage): void {
-    const currentContactsAndChats = this.$contactsAndChats.getValue();
+    const currentContactsAndChats = this.$contactsAndChats.getValue()!;
 
     let c = -1;
     if (message.chatId) {

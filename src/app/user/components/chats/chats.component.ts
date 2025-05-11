@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ChatItemComponent } from '../chat-item/chat-item.component';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
@@ -9,9 +9,12 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { ChatService } from './chat.service';
 import { CombinedContactsAndChats } from './combine-and-sort.messages';
-import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 import { sortContactsAndChats } from '../../../shared/utils/sortContactsAndChats';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { IUser } from './user-chats-and-contacts';
+import { MessageService } from '../message-area/message.service';
 
 @Component({
   selector: 'psk-chats',
@@ -34,29 +37,58 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
     MatNavList,
     RouterLink,
     RouterLinkActive,
+    ReactiveFormsModule,
   ],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
 export class ChatsComponent implements OnInit, OnDestroy {
-  public contactsAndChats: CombinedContactsAndChats[] = [];
+  public contactsAndChats: CombinedContactsAndChats[] | null = null;
+  public searchResult: IUser[] | null = null;
   protected chatsService = inject(ChatService);
-  private subscription: Subscription = new Subscription();
+  protected messageService = inject(MessageService);
+  private subscriptions: Subscription[] = [];
+  public fb = inject(FormBuilder);
+  public searchForm = this.fb.group({
+    search: [''],
+  });
+  public isShowSearch = signal<boolean>(false);
 
   public ngOnInit() {
-    this.subscription.add(
+    this.subscriptions.push(
       this.chatsService.$contactsAndChats.subscribe(contactsAndChats => {
-        if (contactsAndChats.length > 0) {
+        if (contactsAndChats) {
           this.contactsAndChats = sortContactsAndChats(contactsAndChats);
         } else {
-          this.chatsService.getChatsAndContacts().subscribe(loadedContactsAndChats =>
-            this.contactsAndChats = loadedContactsAndChats);
+          this.chatsService.getChatsAndContacts().subscribe();
+        }
+      })
+    );
+    this.subscriptions.push(
+      this.searchForm.controls.search.valueChanges.pipe(
+        debounceTime(700),
+        distinctUntilChanged()
+      ).subscribe(value => {
+        if (value && value.trim() !== '') {
+          this.chatsService.search(value).subscribe(
+            result => this.searchResult = result
+          );
+        } else {
+          this.searchResult = [];
         }
       })
     );
   }
 
   public ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
+
+  protected resetSearch() {
+    this.isShowSearch.set(false);
+    this.searchForm.controls.search.setValue('');
+    this.searchResult = null;
+  }
+
+  protected readonly console = console;
 }

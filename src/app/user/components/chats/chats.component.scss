@@ -1,4 +1,4 @@
-.field_search {
+.field-search {
   display: flex;
   align-items: stretch;
 
@@ -9,10 +9,10 @@
 
 mat-tab-group {
   height: calc(100% - 56px);
+}
 
-  mat-list-item {
-    height: 72px !important;
-  }
+mat-list-item {
+  height: 72px !important;
 }
 
 .active {
@@ -26,4 +26,11 @@ mat-tab-group {
   right: 20px;
 }
 
+.overflow {
+  height: calc(100% - 56px);
+  overflow: auto;
+}
 
+.m-0-8 {
+  margin: 0 8px;
+}

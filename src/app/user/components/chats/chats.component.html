@@ -1,40 +1,71 @@
-<div class="field_search">
-  <button [matMenuTriggerFor]="menu" [style.margin-top]="'4px'" mat-icon-button>
-    <mat-icon>more_horiz</mat-icon>
-  </button>
-
-  <mat-menu #menu="matMenu" [style.margin]="0">
-    <button mat-menu-item>
-      <mat-icon>archive</mat-icon>
-      <span>Архив</span>
+<div class="field-search">
+  @if (this.isShowSearch()) {
+    <button [style.margin-top]="'4px'" mat-icon-button (click)="resetSearch()">
+      <mat-icon>arrow_back</mat-icon>
     </button>
-  </mat-menu>
+  } @else {
+    <button [matMenuTriggerFor]="menu" [style.margin-top]="'4px'" mat-icon-button>
+      <mat-icon>more_horiz</mat-icon>
+    </button>
 
-  <mat-form-field subscriptSizing="dynamic">
-    <input matInput placeholder="Поиск">
+    <mat-menu #menu="matMenu" [style.margin]="0">
+      <button mat-menu-item>
+        <mat-icon>archive</mat-icon>
+        <span>Архив</span>
+      </button>
+    </mat-menu>
+  }
+  <mat-form-field subscriptSizing="dynamic" [formGroup]="this.searchForm">
+    <input formControlName="search" matInput placeholder="Поиск" (focusin)="this.isShowSearch.set(true)">
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 </div>
 
-<mat-tab-group>
-  <mat-tab label="Все">
+@if (this.isShowSearch()) {
+  <div class="overflow">
+    @if (this.searchForm.controls.search.value === '') {
+      <mat-nav-list>
+        <div class="m-0-8">Начните ввод</div>
+      </mat-nav-list>
+    } @else {
     <mat-nav-list>
-      @for (c of contactsAndChats; track $index) {
-        @if (c.type === 'contact') {
-          <mat-list-item (click)="this.chatsService.setActive(c)"
-                         [routerLink]="['contacts', c.id]" routerLinkActive="active">
-            <psk-chat-item [c]="c"></psk-chat-item>
-          </mat-list-item>
-        } @else if (c.type === 'chat') {
-          <mat-list-item (click)="this.chatsService.setActive(c)"
-                         [routerLink]="['chats', c.id]" routerLinkActive="active">
-            <psk-chat-item [c]="c"></psk-chat-item>
+      @if (searchResult && searchResult.length > 0) {
+        @for (c of searchResult; track $index) {
+          <mat-list-item [routerLink]="['contacts', c.id]" (click)="this.messageService.$newContact.next(c)" routerLinkActive="active">
+            <psk-chat-item [u]="c"></psk-chat-item>
           </mat-list-item>
         }
+      } @else {
+        <div class="m-0-8">Ничего не найдено</div>
       }
     </mat-nav-list>
-  </mat-tab>
-</mat-tab-group>
-<button class="btn-create-chat" color="primary" mat-fab matTooltip="Новый чат">
-  <mat-icon>create</mat-icon>
-</button>
+    }
+  </div>
+} @else {
+  <mat-tab-group>
+    <mat-tab label="Все">
+      <mat-nav-list>
+        @if (contactsAndChats && contactsAndChats.length > 0) {
+          @for (c of contactsAndChats; track $index) {
+            @if (c.type === 'contact') {
+              <mat-list-item (click)="this.chatsService.setActive(c); this.messageService.$newContact.next(null)"
+                             [routerLink]="['contacts', c.id]" routerLinkActive="active">
+                <psk-chat-item [c]="c"></psk-chat-item>
+              </mat-list-item>
+            } @else if (c.type === 'chat') {
+              <mat-list-item (click)="this.chatsService.setActive(c); this.messageService.$newContact.next(null)"
+                             [routerLink]="['chats', c.id]" routerLinkActive="active">
+                <psk-chat-item [c]="c"></psk-chat-item>
+              </mat-list-item>
+            }
+          }
+        } @else {
+          <div class="m-0-8">Не добавлен ни один контакт. Воспользуйтесь поиском</div>
+        }
+      </mat-nav-list>
+    </mat-tab>
+  </mat-tab-group>
+  <button class="btn-create-chat" color="primary" mat-fab matTooltip="Новый чат">
+    <mat-icon>create</mat-icon>
+  </button>
+}
