@@ -4,6 +4,8 @@ import { SidenavService } from './sidenav.service';
 import { RouterOutlet } from '@angular/router';
 import { ChatsComponent } from '../../user/components/chats/chats.component';
 import { ChatService } from '../../user/components/chats/chat.service';
+import { UserService } from '../../user/services/user.service';
+import { SocketService } from '../../user/services/socket.service';
 
 @Component({
   selector: 'psk-sidenav',
@@ -19,6 +21,8 @@ import { ChatService } from '../../user/components/chats/chat.service';
 })
 export class SidenavComponent implements OnInit, OnDestroy {
   protected sidenavService = inject(SidenavService);
+  private userService = inject(UserService);
+  private socketService = inject(SocketService);
   private chatsService = inject(ChatService);
 
   @HostListener('window:resize', ['$event'])
@@ -42,7 +46,13 @@ export class SidenavComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    return;
+    this.userService.$user.subscribe(
+      user => {
+        if (user) {
+          this.socketService.connect(user.id.toString());
+        }
+      }
+    );
   }
 
   public ngOnDestroy(): void {

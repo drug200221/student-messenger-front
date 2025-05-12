@@ -36,7 +36,7 @@
           <div *ngIf="shouldDisplayDate($index, c.messages)" class="date-divider">
             {{ getDateLabel(message.date.date) }}
           </div>
-          @if (+message.sender.id === this.chatsService.$user.value?.id) {
+          @if (+message.sender.id === this.userService.$user.value?.id) {
             <div class="sender">
               <mat-card>
                 <mat-card-content>{{ message.text }}</mat-card-content>
@@ -63,7 +63,7 @@
                   <img alt="" src=""/>
                   {{ getLetters(message.sender.fullName) }}
                 </div>
-                <mat-card>
+                <mat-card [ngClass]="message.status === 0 ? 'unread' : ''">
                   <mat-card-title *ngIf="c.type === 'chat'"
                                   [ngClass]="'text_' + message.sender.color">{{ message.sender.fullName }}
                   </mat-card-title>

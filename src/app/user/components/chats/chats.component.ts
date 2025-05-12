@@ -45,14 +45,14 @@ import { MessageService } from '../message-area/message.service';
 export class ChatsComponent implements OnInit, OnDestroy {
   public contactsAndChats: CombinedContactsAndChats[] | null = null;
   public searchResult: IUser[] | null = null;
-  protected chatsService = inject(ChatService);
-  protected messageService = inject(MessageService);
-  private subscriptions: Subscription[] = [];
   public fb = inject(FormBuilder);
   public searchForm = this.fb.group({
     search: [''],
   });
   public isShowSearch = signal<boolean>(false);
+  protected chatsService = inject(ChatService);
+  protected messageService = inject(MessageService);
+  private subscriptions: Subscription[] = [];
 
   public ngOnInit() {
     this.subscriptions.push(
@@ -89,6 +89,4 @@ export class ChatsComponent implements OnInit, OnDestroy {
     this.searchForm.controls.search.setValue('');
     this.searchResult = null;
   }
-
-  protected readonly console = console;
 }

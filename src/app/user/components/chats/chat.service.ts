@@ -5,8 +5,8 @@ import { IApiResponse } from '../../../core/interfaces/api-response';
 import { env } from '../../../../env/env';
 import { IContactOrChat, IContactOrChatMessage, IUser } from './user-chats-and-contacts';
 import { combineAndSortMessages, CombinedContactsAndChats } from './combine-and-sort.messages';
-import { SocketService } from '../../services/socket.service';
 import { SidenavService } from '../../../shared/sidenav/sidenav.service';
+import { UserService } from '../../services/user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,12 +14,11 @@ import { SidenavService } from '../../../shared/sidenav/sidenav.service';
 export class ChatService {
   public isActiveChatId = signal(-1);
   public isActiveContactId = signal(-1);
-  public $user = new BehaviorSubject<IUser | null>(null);
   public $contacts = new BehaviorSubject<IContactOrChat[]>([]);
   public $chats = new BehaviorSubject<IContactOrChat[]>([]);
   public $contactsAndChats = new BehaviorSubject<CombinedContactsAndChats[] | null>(null);
-  private socketService = inject(SocketService);
   private sidenavService = inject(SidenavService);
+  private userService = inject(UserService);
   private http = inject(HttpClient);
 
   public search(text: string) {
@@ -37,12 +36,15 @@ export class ChatService {
     return this.http.get<IApiResponse<IUser>>(`${env.baseApiUrl}`).pipe(
       tap((response) => {
         if (response.result) {
-          this.$user.next(response.result);
-          this.socketService.connect(`${response.result.id}`);
-
+          this.userService.$user.next(response.result);
           this.$contacts.next(response.result.contacts);
           this.$chats.next(response.result.chats);
           this.$contactsAndChats.next(combineAndSortMessages(response.result));
+        }
+        if (response.error) {
+          if (response.error.code === 403) {
+            window.alert('Авторизуйтесь `http://localhost:8080/student`'); // TODO: заменить ссылку или переделать
+          }
         }
         return [];
       }),
@@ -60,9 +62,12 @@ export class ChatService {
     if (message.chatId) {
       c = currentContactsAndChats.findIndex(c => c.id === message.chatId && c.type === 'chat');
     } else if (message.recipientId) {
-      c = currentContactsAndChats.findIndex(c => c.id === message.recipientId && c.type === 'contact');
+      c = currentContactsAndChats.findIndex(
+        c => c.id === message.recipientId && c.type === 'contact' ||
+          c.id === +message.sender.id && c.type === 'contact'
+      );
     }
-    console.log(c);
+
     if (c !== -1) {
       currentContactsAndChats[c].messages.push(message);
       this.$contactsAndChats.next([...currentContactsAndChats]);

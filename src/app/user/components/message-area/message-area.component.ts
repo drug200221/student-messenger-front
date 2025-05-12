@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -17,6 +17,7 @@ import { getDateLabel } from '../../../shared/utils/getDateLabel';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IMessageRequest } from './contact-message_request';
 import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'psk-message-area',
@@ -43,13 +44,14 @@ import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
   templateUrl: './message-area.component.html',
   styleUrl: './message-area.component.scss',
 })
-export class MessageAreaComponent implements OnInit, OnDestroy {
-  @ViewChild('messageDisplay') public messageDisplay!: ElementRef;
+export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('messageDisplay') public messageDisplayRef!: ElementRef;
   protected readonly getLetters = getLetters;
   protected readonly getDateLabel = getDateLabel;
   protected sidenavService = inject(SidenavService);
   protected c: CombinedContactsAndChats | undefined;
   protected chatsService = inject(ChatService);
+  protected userService = inject(UserService);
   private messageService = inject(MessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -91,7 +93,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
               messages => {
                 this.c!.messages = messages;
                 this.chatsService.setActive(this.c!);
-                this.scrollToBottom();
+                // this.scrollToBottom();
               });
           } else {
             const c = this.messageService.$newContact.value;
@@ -114,14 +116,31 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
       ).subscribe());
   }
 
+  public ngAfterViewInit() {
+    this.scrollToFirstUnread();
+  }
+
   public ngOnDestroy() {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
+  public scrollToFirstUnread() {
+    if (!this.messageDisplayRef) {
+      return;
+    }
+
+    const messageDisplayEl = this.messageDisplayRef.nativeElement as HTMLElement;
+    const firstUnread = messageDisplayEl.querySelector('.recipient mat-card.unread');
+
+    if (firstUnread) {
+      firstUnread.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }
+
   public scrollToBottom() {
-    if (this.messageDisplay) {
+    if (this.messageDisplayRef) {
       setTimeout(() => {
-        const element = this.messageDisplay.nativeElement;
+        const element = this.messageDisplayRef.nativeElement;
         element.scrollTop = element.scrollHeight;
       }, 30);
     }
@@ -143,7 +162,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
             replyMessageId: null,
             fileId: null,
           });
-          this.scrollToBottom();
+          // this.scrollToBottom();
         },
       });
     }
@@ -164,7 +183,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
             replyMessageId: null,
             fileId: null,
           });
-          this.scrollToBottom();
+          // this.scrollToBottom();
         },
       });
     }

@@ -7,6 +7,7 @@ import { getDateMessage } from '../../../shared/utils/getDateMessage';
 import { ChatService } from '../chats/chat.service';
 import { MatBadge } from '@angular/material/badge';
 import { IUser } from '../chats/user-chats-and-contacts';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'psk-chat-item',
@@ -24,4 +25,5 @@ export class ChatItemComponent {
   protected readonly getLetters = getLetters;
   protected readonly getDateMessage = getDateMessage;
   protected chatService = inject(ChatService);
+  protected userService = inject(UserService);
 }

@@ -6,7 +6,6 @@ import { IContactOrChatMessage, IUser } from '../chats/user-chats-and-contacts';
 import { env } from '../../../../env/env';
 import { IMessageRequest } from './contact-message_request';
 import { SocketService } from '../../services/socket.service';
-import { ChatService } from '../chats/chat.service';
 import { ParamMap } from '@angular/router';
 
 @Injectable({
@@ -15,7 +14,6 @@ import { ParamMap } from '@angular/router';
 export class MessageService {
   public $newContact = new BehaviorSubject<IUser | null>(null);
   private socketService = inject(SocketService);
-  private chatService = inject(ChatService);
   private http = inject(HttpClient);
 
   public getMessages(param: ParamMap) {
@@ -47,8 +45,6 @@ export class MessageService {
     return this.http.post<IApiResponse<IContactOrChatMessage>>(`${env.baseApiUrl}/chat-contact/`, request).pipe(
       tap(response => {
         if (response.result) {
-          console.log(response.result);
-          this.chatService.addMessage(response.result);
           this.socketService.sendMessage(response.result);
         }
       }),

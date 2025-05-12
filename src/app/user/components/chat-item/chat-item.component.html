@@ -1,18 +1,18 @@
 @if (c) {
-<div class="dialog">
-  <div [ngClass]="c.color.toLowerCase()" class="avatar">
-    <img alt="" src="">
-    {{ c.type === "contact" ? getLetters(c.fullName!) : this.getLetters(c.title!) }}
-  </div>
-  <div class="column">
-    <div class="row">
-      <div class="dialog-title">
-        <span>{{ c.type === "contact" ? c.fullName! : c.title! }}</span>
-      </div>
-      <div class="message-info">
-        @if (c.messages.length > 0) {
-          @if (+c.messages[c.messages.length - 1].sender.id === this.chatService.$user.value?.id) {
-            <span class="message-status">
+  <div class="dialog">
+    <div [ngClass]="c.color.toLowerCase()" class="avatar">
+      <img alt="" src="">
+      {{ c.type === "contact" ? getLetters(c.fullName!) : this.getLetters(c.title!) }}
+    </div>
+    <div class="column">
+      <div class="row">
+        <div class="dialog-title">
+          <span>{{ c.type === "contact" ? c.fullName! : c.title! }}</span>
+        </div>
+        <div class="message-info">
+          @if (c.messages.length > 0) {
+            @if (+c.messages[c.messages.length - 1].sender.id === this.userService.$user.value?.id) {
+              <span class="message-status">
               @if (c.messages[c.messages.length - 1].status === 1) {
                 <mat-icon color="primary">check</mat-icon>
                 <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
@@ -20,29 +20,29 @@
                 <mat-icon>check</mat-icon>
               }
             </span>
+            }
+            <span class="message-time">{{ getDateMessage(c.messages[c.messages.length - 1].date) }}</span>
           }
-          <span class="message-time">{{ getDateMessage(c.messages[c.messages.length - 1].date) }}</span>
+        </div>
+      </div>
+      <div class="row">
+        @if (c.messages.length > 0) {
+          <div class="subtitle">
+            @if (c.type === 'chat') {
+              @if (c.messages[c.messages.length - 1].sender.id !== this.userService.$user.value?.id) {
+                <span class="last-user">{{ c.messages[c.messages.length - 1].sender.shortName }}: </span>
+              }
+            }
+            @if (c.messages[c.messages.length - 1].sender.id === this.userService.$user.value?.id) {
+              <span class="last-user">Вы: </span>
+            }
+            <span>{{ c.messages[c.messages.length - 1].text }}</span>
+          </div>
+          <div class="badge" matBadge="{{ c.newMessages }}"></div>
         }
       </div>
     </div>
-    <div class="row">
-      @if (c.messages.length > 0) {
-        <div class="subtitle">
-          @if (c.type === 'chat') {
-            @if (c.messages[c.messages.length - 1].sender.id !== this.chatService.$user.value?.id) {
-              <span class="last-user">{{ c.messages[c.messages.length - 1].sender.shortName }}: </span>
-            }
-          }
-          @if (c.messages[c.messages.length - 1].sender.id === this.chatService.$user.value?.id) {
-            <span class="last-user">Вы: </span>
-          }
-          <span>{{ c.messages[c.messages.length - 1].text }}</span>
-        </div>
-        <div class="badge" matBadge="{{ c.newMessages }}"></div>
-      }
-    </div>
   </div>
-</div>
 } @else if (u) {
   <div class="dialog">
     <div [ngClass]="u.color.toLowerCase()" class="avatar">
