@@ -5,7 +5,6 @@ export interface IMessageRequest {
   text: string,
   replyMessageId?: number,
   fileId?: number,
-  status?: number,
   isEdited?: boolean,
   deletedBySender?: boolean,
   deletedByRecipient?: boolean,

@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild
+} from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -18,6 +28,8 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { IMessageRequest } from './contact-message_request';
 import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
 import { UserService } from '../../services/user.service';
+import { MessageInteractionService } from './message-interaction.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
   selector: 'psk-message-area',
@@ -44,7 +56,7 @@ import { UserService } from '../../services/user.service';
   templateUrl: './message-area.component.html',
   styleUrl: './message-area.component.scss',
 })
-export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
+export class MessageAreaComponent implements OnInit, OnDestroy {
   @ViewChild('messageDisplay') public messageDisplayRef!: ElementRef;
   protected readonly getLetters = getLetters;
   protected readonly getDateLabel = getDateLabel;
@@ -53,6 +65,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
   protected chatsService = inject(ChatService);
   protected userService = inject(UserService);
   private messageService = inject(MessageService);
+  private messageInteractionService = inject(MessageInteractionService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
@@ -69,8 +82,23 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
     fileId: [null],
   });
   private subscriptions: Subscription[] = [];
+  private socketService = inject(SocketService);
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) {
+  }
 
   public ngOnInit() {
+    this.messageInteractionService.scrollToFirstUnreadSubject.subscribe(() => {
+      this.ngZone.runOutsideAngular(() => {
+        setTimeout(() => {
+          this.cdr.detectChanges();
+          this.scrollToFirstUnread();
+        }, 50);
+      });
+    });
     this.subscriptions.push(
       this.route.paramMap.pipe(
         tap((params) => {
@@ -93,7 +121,6 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
               messages => {
                 this.c!.messages = messages;
                 this.chatsService.setActive(this.c!);
-                // this.scrollToBottom();
               });
           } else {
             const c = this.messageService.$newContact.value;
@@ -102,6 +129,8 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
                 id: c.id,
                 fullName: c.fullName,
                 color: c.color,
+                lastReadMessageUserId: 0,
+                lastReadMessageContactId: 0,
                 isArchived: false,
                 notify: true,
                 messages: [],
@@ -116,12 +145,37 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
       ).subscribe());
   }
 
-  public ngAfterViewInit() {
-    this.scrollToFirstUnread();
-  }
-
   public ngOnDestroy() {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
+  public updateLastReadMessageId() {
+    if (!this.c) {
+      return;
+    }
+
+    let maxMessageId = this.c.lastReadMessageUserId;
+    const messageDisplayEl = this.messageDisplayRef.nativeElement as HTMLElement;
+
+    const messages = messageDisplayEl.querySelectorAll<HTMLElement>('.recipient mat-card.unread');
+
+    messages.forEach(msg => {
+      const rect = msg.getBoundingClientRect();
+      const containerRect = messageDisplayEl.getBoundingClientRect();
+
+      if (rect.bottom > containerRect.top && rect.top < containerRect.bottom) {
+        const messageId = parseInt(msg.id, 10);
+        if (messageId > maxMessageId) {
+          maxMessageId = messageId;
+        }
+      }
+    });
+
+    if (maxMessageId > this.c.lastReadMessageUserId) {
+      this.c.lastReadMessageUserId = maxMessageId;
+      this.socketService.markMessagesAsRead(this.c);
+      console.log('sss');
+    }
   }
 
   public scrollToFirstUnread() {
@@ -133,7 +187,9 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
     const firstUnread = messageDisplayEl.querySelector('.recipient mat-card.unread');
 
     if (firstUnread) {
-      firstUnread.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      firstUnread.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      this.scrollToBottom();
     }
   }
 
@@ -142,7 +198,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
       setTimeout(() => {
         const element = this.messageDisplayRef.nativeElement;
         element.scrollTop = element.scrollHeight;
-      }, 30);
+      }, 0);
     }
   }
 
@@ -162,7 +218,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
             replyMessageId: null,
             fileId: null,
           });
-          // this.scrollToBottom();
+          this.scrollToBottom();
         },
       });
     }
@@ -183,7 +239,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy, AfterViewInit {
             replyMessageId: null,
             fileId: null,
           });
-          // this.scrollToBottom();
+          this.scrollToBottom();
         },
       });
     }

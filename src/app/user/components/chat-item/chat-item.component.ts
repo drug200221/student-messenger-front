@@ -4,7 +4,6 @@ import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
 import { NgClass } from '@angular/common';
 import { getLetters } from '../../../shared/utils/getLetters';
 import { getDateMessage } from '../../../shared/utils/getDateMessage';
-import { ChatService } from '../chats/chat.service';
 import { MatBadge } from '@angular/material/badge';
 import { IUser } from '../chats/user-chats-and-contacts';
 import { UserService } from '../../services/user.service';
@@ -24,6 +23,5 @@ export class ChatItemComponent {
   @Input() public u?: IUser;
   protected readonly getLetters = getLetters;
   protected readonly getDateMessage = getDateMessage;
-  protected chatService = inject(ChatService);
   protected userService = inject(UserService);
 }

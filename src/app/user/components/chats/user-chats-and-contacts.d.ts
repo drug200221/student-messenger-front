@@ -16,7 +16,6 @@ interface IContactOrChatMessage {
   messageId: number;
   replyMessageId: number | null;
   text: string;
-  status: number;
   date: DateTime;
   deletedBySender: boolean;
   deletedByRecipient: boolean;
@@ -30,6 +29,8 @@ interface IContactOrChat {
   title?: string; // для чата
   description?: string | null; // для чата
   color: string;
+  lastReadMessageUserId: number;
+  lastReadMessageContactId: number;
   isArchived: boolean;
   notify: boolean;
   messages: IContactOrChatMessage[];

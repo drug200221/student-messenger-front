@@ -13,7 +13,7 @@
           @if (c.messages.length > 0) {
             @if (+c.messages[c.messages.length - 1].sender.id === this.userService.$user.value?.id) {
               <span class="message-status">
-              @if (c.messages[c.messages.length - 1].status === 1) {
+              @if (c.messages[c.messages.length - 1].messageId < c.lastReadMessageContactId) {
                 <mat-icon color="primary">check</mat-icon>
                 <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
               } @else {

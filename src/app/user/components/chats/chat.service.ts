@@ -88,4 +88,13 @@ export class ChatService {
       this.isActiveChatId = signal(c.id);
     }
   }
+
+  // public viewContactMessages(contact: IContactOrChat) {
+  //   const index = this.$contactsAndChats.value!.findIndex(c => c.id === contact.id);
+  //   if (index !== -1) {
+  //     const contacts = [...this.$contactsAndChats.value!];
+  //     contacts[index] = { ...contacts[index], lastReadMessageContactId: messageId };
+  //     this.$contactsAndChats.next(contacts);
+  //   }
+  // }
 }

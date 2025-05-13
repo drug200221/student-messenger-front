@@ -3,6 +3,7 @@ import { io } from 'socket.io-client';
 import { env } from '../../../env/env';
 import { IContactOrChatMessage } from '../components/chats/user-chats-and-contacts';
 import { ChatService } from '../components/chats/chat.service';
+import { CombinedContactsAndChats } from '../components/chats/combine-and-sort.messages';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +26,11 @@ export class SocketService {
 
     this.socket.on('chat message', ({ message }) => {
       console.log('Received chat message:', { message });
+    });
+
+    this.socket.on('read messages', ({ contact }) => {
+      // this.chatService.viewContactMessages(contact);
+      console.log('Private message viewed:', { contact });
     });
   }
 
@@ -49,7 +55,7 @@ export class SocketService {
     }
   }
 
-  public markMessagesAsRead(messageIds: number[]) {
-    this.socket.emit('messagesRead', { messageIds });
+  public markMessagesAsRead(contact: CombinedContactsAndChats) {
+    this.socket.emit('read messages', { contact: contact });
   }
 }

@@ -15,6 +15,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { IUser } from './user-chats-and-contacts';
 import { MessageService } from '../message-area/message.service';
+import { MessageInteractionService } from '../message-area/message-interaction.service';
 
 @Component({
   selector: 'psk-chats',
@@ -52,6 +53,7 @@ export class ChatsComponent implements OnInit, OnDestroy {
   public isShowSearch = signal<boolean>(false);
   protected chatsService = inject(ChatService);
   protected messageService = inject(MessageService);
+  private messageInteractionService = inject(MessageInteractionService);
   private subscriptions: Subscription[] = [];
 
   public ngOnInit() {
@@ -82,6 +84,14 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy() {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
+  public onClickChat(c: CombinedContactsAndChats) {
+    this.chatsService.setActive(c);
+    this.messageService.$newContact.next(null);
+    setTimeout(() => {
+      this.messageInteractionService.triggerScrollToFirstUnread();
+    }, 0);
   }
 
   protected resetSearch() {

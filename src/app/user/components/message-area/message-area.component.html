@@ -31,7 +31,7 @@
       </div>
     </mat-toolbar>
     <div class="messages">
-      <div #messageDisplay class="message-display">
+      <div #messageDisplay class="message-display" (scroll)="updateLastReadMessageId()">
         @for (message of c.messages; track $index) {
           <div *ngIf="shouldDisplayDate($index, c.messages)" class="date-divider">
             {{ getDateLabel(message.date.date) }}
@@ -46,7 +46,7 @@
                   }
                   <span class="text">{{ message.date.date | date: 'HH:mm' }}</span>
                   <span class="status icon">
-                    @if (message.status === 1) {
+                    @if (message.messageId <= c.lastReadMessageContactId) {
                       <mat-icon color="primary">check</mat-icon>
                       <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
                     } @else {
@@ -57,22 +57,21 @@
               </mat-card>
             </div>
           } @else {
-            <div>
-              <div class="recipient">
-                <div *ngIf="c.type === 'chat'" [ngClass]="message.sender.color" class="avatar">
-                  <img alt="" src=""/>
-                  {{ getLetters(message.sender.fullName) }}
-                </div>
-                <mat-card [ngClass]="message.status === 0 ? 'unread' : ''">
-                  <mat-card-title *ngIf="c.type === 'chat'"
-                                  [ngClass]="'text_' + message.sender.color">{{ message.sender.fullName }}
-                  </mat-card-title>
-                  <mat-card-content>{{ message.text }}</mat-card-content>
-                  <mat-card-footer class="info">
-                    <span class="text">{{ message.date.date | date: 'HH:mm' }}</span>
-                  </mat-card-footer>
-                </mat-card>
+            <div class="recipient">
+              <div *ngIf="c.type === 'chat'" [ngClass]="message.sender.color" class="avatar">
+                <img alt="" src=""/>
+                {{ getLetters(message.sender.fullName) }}
               </div>
+              <mat-card [id]="message.messageId"
+                        [ngClass]="message.messageId > c.lastReadMessageUserId ? 'unread' : ''">
+                <mat-card-title *ngIf="c.type === 'chat'"
+                                [ngClass]="'text_' + message.sender.color">{{ message.sender.fullName }}
+                </mat-card-title>
+                <mat-card-content>{{ message.text }}</mat-card-content>
+                <mat-card-footer class="info">
+                  <span class="text">{{ message.date.date | date: 'HH:mm' }}</span>
+                </mat-card-footer>
+              </mat-card>
             </div>
           }
         }
