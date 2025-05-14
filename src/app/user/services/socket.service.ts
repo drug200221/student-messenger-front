@@ -28,9 +28,9 @@ export class SocketService {
       console.log('Received chat message:', { message });
     });
 
-    this.socket.on('read messages', ({ contact }) => {
-      // this.chatService.viewContactMessages(contact);
-      console.log('Private message viewed:', { contact });
+    this.socket.on('read messages', ({ message }) => {
+      this.chatService.viewContactMessages(message);
+      console.log('Read private message:', { message });
     });
   }
 
@@ -56,6 +56,24 @@ export class SocketService {
   }
 
   public markMessagesAsRead(contact: CombinedContactsAndChats) {
-    this.socket.emit('read messages', { contact: contact });
+    const contactsAndChats = this.chatService.$contactsAndChats.value!;
+    const lastReadMessage = contact.messages.find(message => message.messageId === contact.lastReadMessageUserId);
+
+    let newMessage = 0;
+    if (lastReadMessage) {
+      contact.messages.forEach(m => {
+        if (m.messageId > lastReadMessage.messageId) {
+          newMessage++;
+        }
+      });
+      const index = contactsAndChats.findIndex(c => c.id === contact.id && contact.type === 'contact');
+      contactsAndChats[index].newMessages = newMessage;
+
+      this.chatService.$contactsAndChats.next(contactsAndChats);
+    }
+
+    if (lastReadMessage) {
+      this.socket.emit('read messages', { message: lastReadMessage });
+    }
   }
 }

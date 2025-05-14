@@ -58,18 +58,23 @@ export class ChatService {
   public addMessage(message: IContactOrChatMessage): void {
     const currentContactsAndChats = this.$contactsAndChats.getValue()!;
 
-    let c = -1;
+    let index = -1;
+    let recipient = null;
     if (message.chatId) {
-      c = currentContactsAndChats.findIndex(c => c.id === message.chatId && c.type === 'chat');
+      index = currentContactsAndChats.findIndex(c => c.id === message.chatId && c.type === 'chat');
     } else if (message.recipientId) {
-      c = currentContactsAndChats.findIndex(
+      index = currentContactsAndChats.findIndex(
         c => c.id === message.recipientId && c.type === 'contact' ||
           c.id === +message.sender.id && c.type === 'contact'
       );
+      recipient = currentContactsAndChats.find(c => c.id === message.recipientId && c.type === 'contact');
     }
 
-    if (c !== -1) {
-      currentContactsAndChats[c].messages.push(message);
+    if (index !== -1) {
+      if (!recipient) {
+        currentContactsAndChats[index].newMessages++;
+      }
+      currentContactsAndChats[index].messages.push(message);
       this.$contactsAndChats.next([...currentContactsAndChats]);
     }
   }
@@ -89,12 +94,24 @@ export class ChatService {
     }
   }
 
-  // public viewContactMessages(contact: IContactOrChat) {
-  //   const index = this.$contactsAndChats.value!.findIndex(c => c.id === contact.id);
-  //   if (index !== -1) {
-  //     const contacts = [...this.$contactsAndChats.value!];
-  //     contacts[index] = { ...contacts[index], lastReadMessageContactId: messageId };
-  //     this.$contactsAndChats.next(contacts);
-  //   }
-  // }
+  public viewContactMessages(message: IContactOrChatMessage) {
+    const currentContactsAndChats = this.$contactsAndChats.getValue()!;
+
+    let index = -1;
+    if (message.chatId) {
+      index = currentContactsAndChats.findIndex(c => c.id === message.chatId && c.type === 'chat');
+    } else if (message.recipientId) {
+      index = currentContactsAndChats.findIndex(
+        c => c.id === message.recipientId && c.type === 'contact'
+      );
+    }
+
+    if (index !== -1) {
+      currentContactsAndChats[index] = {
+        ...currentContactsAndChats[index],
+        lastReadMessageContactId: message.messageId,
+      };
+    }
+    this.$contactsAndChats.next(currentContactsAndChats);
+  }
 }

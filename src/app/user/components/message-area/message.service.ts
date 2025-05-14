@@ -7,6 +7,8 @@ import { env } from '../../../../env/env';
 import { IMessageRequest } from './contact-message_request';
 import { SocketService } from '../../services/socket.service';
 import { ParamMap } from '@angular/router';
+import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
+import { IReadMessageRequest } from './read-message_request';
 
 @Injectable({
   providedIn: 'root',
@@ -46,6 +48,20 @@ export class MessageService {
       tap(response => {
         if (response.result) {
           this.socketService.sendMessage(response.result);
+        }
+      }),
+      catchError((error) => {
+        console.log(error);
+        return of();
+      })
+    );
+  }
+
+  public read(c: CombinedContactsAndChats, request: IReadMessageRequest) {
+    return this.http.put<IApiResponse<IContactOrChatMessage>>(`${env.baseApiUrl}/chat-contact/${c.id}`, request).pipe(
+      tap(response => {
+        if (response.result) {
+          this.socketService.markMessagesAsRead(c);
         }
       }),
       catchError((error) => {

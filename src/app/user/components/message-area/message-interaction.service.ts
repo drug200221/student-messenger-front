@@ -5,9 +5,9 @@ import { Subject } from 'rxjs';
   providedIn: 'root',
 })
 export class MessageInteractionService {
-  public scrollToFirstUnreadSubject = new Subject<void>();
+  public $scrollToFirstUnreadSubject = new Subject<void>();
 
   public triggerScrollToFirstUnread() {
-    this.scrollToFirstUnreadSubject.next();
+    this.$scrollToFirstUnreadSubject.next();
   }
 }

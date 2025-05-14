@@ -29,7 +29,7 @@ import { IMessageRequest } from './contact-message_request';
 import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
 import { UserService } from '../../services/user.service';
 import { MessageInteractionService } from './message-interaction.service';
-import { SocketService } from '../../services/socket.service';
+import { IReadMessageRequest } from './read-message_request';
 
 @Component({
   selector: 'psk-message-area',
@@ -82,7 +82,6 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
     fileId: [null],
   });
   private subscriptions: Subscription[] = [];
-  private socketService = inject(SocketService);
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -91,14 +90,16 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
-    this.messageInteractionService.scrollToFirstUnreadSubject.subscribe(() => {
-      this.ngZone.runOutsideAngular(() => {
-        setTimeout(() => {
-          this.cdr.detectChanges();
-          this.scrollToFirstUnread();
-        }, 50);
-      });
-    });
+    this.subscriptions.push(
+      this.messageInteractionService.$scrollToFirstUnreadSubject.subscribe(() => {
+        this.ngZone.runOutsideAngular(() => {
+          setTimeout(() => {
+            this.cdr.detectChanges();
+            this.scrollToFirstUnread();
+          }, 50);
+        });
+      })
+    );
     this.subscriptions.push(
       this.route.paramMap.pipe(
         tap((params) => {
@@ -113,16 +114,18 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
             this.contactMessageForm.controls.recipientId.setValue(+cId);
             this.chatMessageForm.controls.chatId.setValue(-1);
           }
-          this.c = this.chatsService.$contactsAndChats.value?.find(
-            c => c.id === cId && c.type === type
+          this.subscriptions.push(
+            this.chatsService.$contactsAndChats.subscribe(
+              cs => {
+                if (cs) {
+                  if (cs[cs.length - 1].id !== this.userService.$user.value?.id || cs[cs.length - 1].newMessages === 0) {
+                    this.scrollToBottom();
+                  }
+                  this.c = cs.find(c => c.id === cId && c.type === type);
+                }
+              })
           );
-          if (this.c) {
-            this.messageService.getMessages(params).subscribe(
-              messages => {
-                this.c!.messages = messages;
-                this.chatsService.setActive(this.c!);
-              });
-          } else {
+          if (!this.c) {
             const c = this.messageService.$newContact.value;
             if (c) {
               this.c = {
@@ -134,7 +137,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
                 isArchived: false,
                 notify: true,
                 messages: [],
-                newMessages: null,
+                newMessages: 0,
                 type: 'contact',
               };
             } else {
@@ -158,7 +161,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
     const messageDisplayEl = this.messageDisplayRef.nativeElement as HTMLElement;
 
     const messages = messageDisplayEl.querySelectorAll<HTMLElement>('.recipient mat-card.unread');
-
+    console.log(messages);
     messages.forEach(msg => {
       const rect = msg.getBoundingClientRect();
       const containerRect = messageDisplayEl.getBoundingClientRect();
@@ -173,8 +176,13 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
 
     if (maxMessageId > this.c.lastReadMessageUserId) {
       this.c.lastReadMessageUserId = maxMessageId;
-      this.socketService.markMessagesAsRead(this.c);
-      console.log('sss');
+      const request: IReadMessageRequest = {
+        type: this.c.type,
+        lastReadMessageUserId: this.c.lastReadMessageUserId,
+        lastReadMessageContactId: this.c.lastReadMessageContactId,
+      };
+
+      this.messageService.read(this.c, request).subscribe();
     }
   }
 
@@ -210,7 +218,12 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
         replyMessageId: this.contactMessageForm.value.replyMessageId as number | undefined,
         fileId: this.contactMessageForm.value.replyMessageId as number | undefined,
       };
-
+      if (this.messageService.$newContact.value !== null) {
+        const contacts = [...this.chatsService.$contactsAndChats.value!];
+        contacts.push(this.c!);
+        this.chatsService.$contactsAndChats.next(contacts);
+        this.messageService.$newContact.next(null);
+      }
       this.messageService.send(request).subscribe({
         next: () => {
           this.contactMessageForm!.reset({

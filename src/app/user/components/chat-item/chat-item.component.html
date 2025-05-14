@@ -13,7 +13,7 @@
           @if (c.messages.length > 0) {
             @if (+c.messages[c.messages.length - 1].sender.id === this.userService.$user.value?.id) {
               <span class="message-status">
-              @if (c.messages[c.messages.length - 1].messageId < c.lastReadMessageContactId) {
+              @if (c.messages[c.messages.length - 1].messageId <= c.lastReadMessageContactId) {
                 <mat-icon color="primary">check</mat-icon>
                 <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
               } @else {
@@ -38,7 +38,7 @@
             }
             <span>{{ c.messages[c.messages.length - 1].text }}</span>
           </div>
-          <div class="badge" matBadge="{{ c.newMessages }}"></div>
+          <div class="badge" matBadge="{{ c.newMessages > 0 ? c.newMessages : '' }}"></div>
         }
       </div>
     </div>
