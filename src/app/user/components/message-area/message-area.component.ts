@@ -1,7 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
-  ElementRef,
+  ElementRef, HostListener,
   inject,
   NgZone,
   OnDestroy,
@@ -58,6 +58,7 @@ import { IReadMessageRequest } from './read-message_request';
 })
 export class MessageAreaComponent implements OnInit, OnDestroy {
   @ViewChild('messageDisplay') public messageDisplayRef!: ElementRef;
+  private isScrollable = false;
   protected readonly getLetters = getLetters;
   protected readonly getDateLabel = getDateLabel;
   protected sidenavService = inject(SidenavService);
@@ -96,6 +97,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
           setTimeout(() => {
             this.cdr.detectChanges();
             this.scrollToFirstUnread();
+            this.checkScroll();
           }, 50);
         });
       })
@@ -119,7 +121,9 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
               cs => {
                 if (cs) {
                   if (cs[cs.length - 1].id !== this.userService.$user.value?.id || cs[cs.length - 1].newMessages === 0) {
-                    this.scrollToBottom();
+                    if (this.maybeScrollToBottom()) {
+                      this.scrollToBottom();
+                    }
                   }
                   this.c = cs.find(c => c.id === cId && c.type === type);
                 }
@@ -152,7 +156,27 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  public updateLastReadMessageId() {
+  @HostListener('window:resize', ['$event'])
+  public checkScroll() {
+    const el = this.messageDisplayRef.nativeElement;
+    this.isScrollable = el.scrollHeight > el.clientHeight;
+  }
+
+  public onMouseMove() {
+    if (!this.isScrollable) {
+      this.updateLastReadMessageId();
+    }
+  }
+
+  public onScroll() {
+    if (this.isScrollable) {
+      setTimeout(() => {
+        this.updateLastReadMessageId();
+      }, 600);
+    }
+  }
+
+  private updateLastReadMessageId() {
     if (!this.c) {
       return;
     }
@@ -161,7 +185,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
     const messageDisplayEl = this.messageDisplayRef.nativeElement as HTMLElement;
 
     const messages = messageDisplayEl.querySelectorAll<HTMLElement>('.recipient mat-card.unread');
-    console.log(messages);
+
     messages.forEach(msg => {
       const rect = msg.getBoundingClientRect();
       const containerRect = messageDisplayEl.getBoundingClientRect();
@@ -179,7 +203,6 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
       const request: IReadMessageRequest = {
         type: this.c.type,
         lastReadMessageUserId: this.c.lastReadMessageUserId,
-        lastReadMessageContactId: this.c.lastReadMessageContactId,
       };
 
       this.messageService.read(this.c, request).subscribe();
@@ -195,10 +218,24 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
     const firstUnread = messageDisplayEl.querySelector('.recipient mat-card.unread');
 
     if (firstUnread) {
-      firstUnread.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      firstUnread.scrollIntoView({ behavior: 'instant', block: 'end' });
     } else {
       this.scrollToBottom();
     }
+  }
+
+  public maybeScrollToBottom() {
+    if (!this.messageDisplayRef) {
+      return;
+    }
+
+    const container = this.messageDisplayRef.nativeElement as HTMLElement;
+    const scrollTop = container.scrollTop;
+    const clientHeight = container.clientHeight;
+    const scrollHeight = container.scrollHeight;
+    const thresholdPx = 300; // порог в пикселях
+
+    return scrollHeight - (scrollTop + clientHeight) < thresholdPx;
   }
 
   public scrollToBottom() {

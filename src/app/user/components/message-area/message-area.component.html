@@ -31,7 +31,7 @@
       </div>
     </mat-toolbar>
     <div class="messages">
-      <div #messageDisplay class="message-display" (scrollend)="updateLastReadMessageId()">
+      <div #messageDisplay class="message-display" (mousemove)="onMouseMove()" (scrollend)="onScroll()">
         @for (message of c.messages; track $index) {
           <div *ngIf="shouldDisplayDate($index, c.messages)" class="date-divider">
             {{ getDateLabel(message.date.date) }}
