@@ -1,7 +1,8 @@
 import {
   ChangeDetectorRef,
   Component,
-  ElementRef, HostListener,
+  ElementRef,
+  HostListener,
   inject,
   NgZone,
   OnDestroy,
@@ -11,7 +12,7 @@ import {
 } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIcon } from '@angular/material/icon';
-import { MatIconButton } from '@angular/material/button';
+import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
 import { MatCard, MatCardContent, MatCardFooter, MatCardTitle } from '@angular/material/card';
@@ -22,7 +23,6 @@ import { Subscription, tap } from 'rxjs';
 import { getLetters } from '../../../shared/utils/getLetters';
 import { DatePipe, NgClass, NgIf } from '@angular/common';
 import { MessageService } from './message.service';
-import { IContactOrChatMessage } from '../chats/user-chats-and-contacts';
 import { getDateLabel } from '../../../shared/utils/getDateLabel';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IMessageRequest } from './contact-message_request';
@@ -30,6 +30,9 @@ import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
 import { UserService } from '../../services/user.service';
 import { MessageInteractionService } from './message-interaction.service';
 import { IReadMessageRequest } from './read-message_request';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { shouldDisplayDate } from '../../../shared/utils/shouldDisplayDate';
+import { MatBadge } from '@angular/material/badge';
 
 @Component({
   selector: 'psk-message-area',
@@ -52,19 +55,26 @@ import { IReadMessageRequest } from './read-message_request';
     DatePipe,
     FormsModule,
     ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    MatButton,
+    MatFabButton,
+    MatBadge,
   ],
   templateUrl: './message-area.component.html',
   styleUrl: './message-area.component.scss',
 })
 export class MessageAreaComponent implements OnInit, OnDestroy {
   @ViewChild('messageDisplay') public messageDisplayRef!: ElementRef;
-  private isScrollable = false;
+  public isSending = false;
+  public scrollBottom = false;
   protected readonly getLetters = getLetters;
   protected readonly getDateLabel = getDateLabel;
   protected sidenavService = inject(SidenavService);
   protected c: CombinedContactsAndChats | undefined;
   protected chatsService = inject(ChatService);
   protected userService = inject(UserService);
+  protected readonly shouldDisplayDate = shouldDisplayDate;
+  private isScrollable = false;
   private messageService = inject(MessageService);
   private messageInteractionService = inject(MessageInteractionService);
   private router = inject(Router);
@@ -143,6 +153,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
                 messages: [],
                 newMessages: 0,
                 type: 'contact',
+                isShowLoadMoreBtn: false,
               };
             } else {
               this.router.navigate(['/']);
@@ -173,39 +184,6 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.updateLastReadMessageId();
       }, 600);
-    }
-  }
-
-  private updateLastReadMessageId() {
-    if (!this.c) {
-      return;
-    }
-
-    let maxMessageId = this.c.lastReadMessageUserId;
-    const messageDisplayEl = this.messageDisplayRef.nativeElement as HTMLElement;
-
-    const messages = messageDisplayEl.querySelectorAll<HTMLElement>('.recipient mat-card.unread');
-
-    messages.forEach(msg => {
-      const rect = msg.getBoundingClientRect();
-      const containerRect = messageDisplayEl.getBoundingClientRect();
-
-      if (rect.bottom > containerRect.top && rect.top < containerRect.bottom) {
-        const messageId = parseInt(msg.id, 10);
-        if (messageId > maxMessageId) {
-          maxMessageId = messageId;
-        }
-      }
-    });
-
-    if (maxMessageId > this.c.lastReadMessageUserId) {
-      this.c.lastReadMessageUserId = maxMessageId;
-      const request: IReadMessageRequest = {
-        type: this.c.type,
-        lastReadMessageUserId: this.c.lastReadMessageUserId,
-      };
-
-      this.messageService.read(this.c, request).subscribe();
     }
   }
 
@@ -247,8 +225,48 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected sendInContact() {
-    if (this.contactMessageForm && this.contactMessageForm.valid && this.contactMessageForm.controls['text'].value) {
+  public goBack() {
+    this.sidenavService.toggleSidenav();
+
+    if (window.innerWidth <= 600) {
+      this.chatsService.isActiveChatId = signal(-1);
+      this.chatsService.isActiveContactId = signal(-1);
+      this.router.navigate(['../']);
+    }
+  }
+
+  public onLoadMore(c: CombinedContactsAndChats) {
+    const container = this.messageDisplayRef.nativeElement;
+    const prevScrollHeight = container.scrollHeight;
+
+    this.messageService.getMessages(c, c.messages.length).subscribe(
+      newMessages => {
+        c.messages.unshift(...newMessages);
+        const offset = 30; // на бэкенде offset==30
+        c.isShowLoadMoreBtn = newMessages.length === offset;
+      }
+    );
+
+    const contactsAndChats = this.chatsService.$contactsAndChats.value!;
+    const index = contactsAndChats.findIndex(cc => c.id === cc.id && c.type === 'contact');
+
+    setTimeout(() => {
+      console.log(container.scrollTop);
+      console.log(container.scrollHeight);
+      console.log(container.prevScrollHeight);
+      const scrollDifference = container.scrollHeight - prevScrollHeight;
+      container.scrollTop = container.scrollTop + scrollDifference;
+    }, 100);
+
+    if (index !== 1) {
+      contactsAndChats[index] = c;
+      this.chatsService.$contactsAndChats.next(contactsAndChats);
+    }
+  }
+
+  public sendInContact() {
+    if (this.contactMessageForm && this.contactMessageForm.valid &&
+      this.contactMessageForm.controls['text'].value) {
       const request: IMessageRequest = {
         recipientId: this.contactMessageForm.value.recipientId as number,
         text: this.contactMessageForm.value.text as string,
@@ -269,12 +287,14 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
             fileId: null,
           });
           this.scrollToBottom();
+
+          this.applyCooldown();
         },
       });
     }
   }
 
-  protected sendInChat() {
+  public sendInChat() {
     if (this.chatMessageForm && this.chatMessageForm.valid && this.chatMessageForm.controls['text'].value) {
       const request: IMessageRequest = {
         chatId: this.chatMessageForm.value.chatId as number,
@@ -290,28 +310,50 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
             fileId: null,
           });
           this.scrollToBottom();
+
+          this.applyCooldown();
         },
       });
     }
   }
 
-  protected shouldDisplayDate($index: number, messages: IContactOrChatMessage[]) {
-    if ($index === 0) {
-      return true;
-    }
-
-    const currentDate = new Date(messages[$index].date.date).setHours(0, 0, 0, 0);
-    const prevDate = new Date(messages[$index - 1].date.date).setHours(0, 0, 0, 0);
-    return currentDate > prevDate;
+  private applyCooldown() {
+    this.isSending = true;
+    setTimeout(() => {
+      this.isSending = false;
+    }, 1500);
   }
 
-  protected goBack() {
-    this.sidenavService.toggleSidenav();
+  private updateLastReadMessageId() {
+    if (!this.c) {
+      return;
+    }
 
-    if (window.innerWidth <= 600) {
-      this.chatsService.isActiveChatId = signal(-1);
-      this.chatsService.isActiveContactId = signal(-1);
-      this.router.navigate(['../']);
+    let maxMessageId = this.c.lastReadMessageUserId;
+    const messageDisplayEl = this.messageDisplayRef.nativeElement as HTMLElement;
+
+    const messages = messageDisplayEl.querySelectorAll<HTMLElement>('.recipient mat-card.unread');
+
+    messages.forEach(msg => {
+      const rect = msg.getBoundingClientRect();
+      const containerRect = messageDisplayEl.getBoundingClientRect();
+
+      if (rect.bottom > containerRect.top && rect.top < containerRect.bottom) {
+        const messageId = parseInt(msg.id, 10);
+        if (messageId > maxMessageId) {
+          maxMessageId = messageId;
+        }
+      }
+    });
+
+    if (maxMessageId > this.c.lastReadMessageUserId) {
+      this.c.lastReadMessageUserId = maxMessageId;
+      const request: IReadMessageRequest = {
+        type: this.c.type,
+        lastReadMessageUserId: this.c.lastReadMessageUserId,
+      };
+
+      this.messageService.read(this.c, request).subscribe();
     }
   }
 }

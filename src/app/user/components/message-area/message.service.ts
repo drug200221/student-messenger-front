@@ -6,7 +6,6 @@ import { IContactOrChatMessage, IUser } from '../chats/user-chats-and-contacts';
 import { env } from '../../../../env/env';
 import { IMessageRequest } from './contact-message_request';
 import { SocketService } from '../../services/socket.service';
-import { ParamMap } from '@angular/router';
 import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
 import { IReadMessageRequest } from './read-message_request';
 
@@ -18,15 +17,13 @@ export class MessageService {
   private socketService = inject(SocketService);
   private http = inject(HttpClient);
 
-  public getMessages(param: ParamMap) {
+  public getMessages(c: CombinedContactsAndChats, loadMessageCount: number) {
     let queryString = '';
 
-    if (param.has('chatId')) {
-      const chatId = param.get('chatId');
-      queryString = `chatId=${chatId}`;
-    } else if (param.has('contactId')) {
-      const contactId = param.get('contactId');
-      queryString = `contactId=${contactId}`;
+    if (c.type === 'chat') {
+      queryString = `chatId=${c.id}&load-message-count=${loadMessageCount}`;
+    } else if (c.type === 'contact') {
+      queryString = `contactId=${c.id}&load-message-count=${loadMessageCount}`;
     }
 
     return this.http.get<IApiResponse<IContactOrChatMessage[]>>(`${env.baseApiUrl}/chat-contact/?${queryString}`).pipe(

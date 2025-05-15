@@ -31,7 +31,8 @@
       <mat-nav-list>
         @if (searchResult && searchResult.length > 0) {
           @for (c of searchResult; track $index) {
-            <mat-list-item [routerLink]="['contacts', c.id]" (click)="this.messageService.$newContact.next(c)"
+            <mat-list-item [routerLink]="['contacts', c.id]"
+                           (click)="this.chatsService.setActive(c.id, 'contact'); this.messageService.$newContact.next(c)"
                            routerLinkActive="active">
               <psk-chat-item [u]="c"></psk-chat-item>
             </mat-list-item>

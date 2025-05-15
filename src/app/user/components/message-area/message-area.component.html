@@ -32,6 +32,11 @@
     </mat-toolbar>
     <div class="messages">
       <div #messageDisplay class="message-display" (mousemove)="onMouseMove()" (scrollend)="onScroll()">
+        @if (c.isShowLoadMoreBtn) {
+          <div class="btn-center">
+            <button mat-button mat-stroked-button (click)="onLoadMore(c)">Загрузить еще</button>
+          </div>
+        }
         @for (message of c.messages; track $index) {
           <div *ngIf="shouldDisplayDate($index, c.messages)" class="date-divider">
             {{ getDateLabel(message.date.date) }}
@@ -75,6 +80,15 @@
             </div>
           }
         }
+        @if (!maybeScrollToBottom()) {
+          <div class="btn-down">
+            <button matBadge="{{ c.newMessages > 0 ? c.newMessages : '' }}" [matBadgeColor]="'accent'" color="primary"
+                    mat-fab
+                    (click)="scrollBottom ? scrollToBottom() : scrollToFirstUnread(); scrollBottom = true;">
+              <mat-icon>arrow_downward</mat-icon>
+            </button>
+          </div>
+        }
       </div>
       @if (c.type === 'contact') {
         <form (ngSubmit)="sendInContact()" class="message-input"
@@ -84,7 +98,7 @@
             <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
             <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
           </mat-form-field>
-          <button [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
+          <button [disabled]="isSending" [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
             <mat-icon>send</mat-icon>
           </button>
         </form>
@@ -96,7 +110,7 @@
             <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
             <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
           </mat-form-field>
-          <button [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
+          <button [disabled]="isSending" [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
             <mat-icon>send</mat-icon>
           </button>
         </form>

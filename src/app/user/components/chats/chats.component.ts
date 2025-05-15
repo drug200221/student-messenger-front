@@ -87,7 +87,7 @@ export class ChatsComponent implements OnInit, OnDestroy {
   }
 
   public onClickChat(c: CombinedContactsAndChats) {
-    this.chatsService.setActive(c);
+    this.chatsService.setActive(c.id, c.type);
     this.messageService.$newContact.next(null);
     setTimeout(() => {
       this.messageInteractionService.triggerScrollToFirstUnread();

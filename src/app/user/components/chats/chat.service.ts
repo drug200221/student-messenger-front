@@ -79,7 +79,7 @@ export class ChatService {
     }
   }
 
-  public setActive(c: CombinedContactsAndChats) {
+  public setActive(cId: number, type: string) {
     if (window.innerWidth <= 600) {
       this.sidenavService.isSidenavOpened = signal(false);
     }
@@ -87,10 +87,10 @@ export class ChatService {
     this.isActiveChatId = signal(-1);
     this.isActiveContactId = signal(-1);
 
-    if (c.type === 'contact') {
-      this.isActiveContactId = signal(c.id);
-    } else if (c.type === 'chat') {
-      this.isActiveChatId = signal(c.id);
+    if (type === 'contact') {
+      this.isActiveContactId = signal(cId);
+    } else if (type === 'chat') {
+      this.isActiveChatId = signal(cId);
     }
   }
 

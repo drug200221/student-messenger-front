@@ -74,6 +74,18 @@
       flex: 1;
       overflow-y: auto;
 
+      .btn-center {
+        display: flex;
+        justify-content: center;
+        margin-top: 8px;
+      }
+
+      .btn-down {
+        position: absolute;
+        bottom: 10%;
+        right: 50%;
+      }
+
       .date-divider {
         text-align: center;
         font-size: 14px;

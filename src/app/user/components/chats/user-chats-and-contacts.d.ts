@@ -35,6 +35,7 @@ interface IContactOrChat {
   notify: boolean;
   messages: IContactOrChatMessage[];
   newMessages: number;
+  isShowLoadMoreBtn: boolean;
 }
 
 interface IUser {
