@@ -58,25 +58,28 @@ export class ChatService {
   public addMessage(message: IContactOrChatMessage): void {
     const currentContactsAndChats = this.$contactsAndChats.getValue()!;
 
-    let index = -1;
-    let recipient = null;
     if (message.chatId) {
-      index = currentContactsAndChats.findIndex(c => c.id === message.chatId && c.type === 'chat');
+      // const index = currentContactsAndChats.findIndex(c => c.id === message.chatId && c.type === 'chat');
     } else if (message.recipientId) {
-      index = currentContactsAndChats.findIndex(
-        c => c.id === message.recipientId && c.type === 'contact' ||
-          c.id === +message.sender.id && c.type === 'contact'
+      const recipientIndex = currentContactsAndChats.findIndex(
+        c => c.id === message.recipientId && c.type === 'contact'
       );
-      recipient = currentContactsAndChats.find(c => c.id === message.recipientId && c.type === 'contact');
+      const senderIndex = currentContactsAndChats.findIndex(
+        c => c.id === +message.sender.id && c.type === 'contact'
+      );
+
+      if (recipientIndex !== -1) {
+        currentContactsAndChats[recipientIndex].messages.push(message);
+      }
+      if (senderIndex !== -1) {
+        if (currentContactsAndChats[senderIndex].id !== this.userService.$user.value?.id) {
+          currentContactsAndChats[senderIndex].newMessagesCount++;
+          currentContactsAndChats[senderIndex].messages.push(message);
+        }
+      }
     }
 
-    if (index !== -1) {
-      if (!recipient) {
-        currentContactsAndChats[index].newMessages++;
-      }
-      currentContactsAndChats[index].messages.push(message);
-      this.$contactsAndChats.next([...currentContactsAndChats]);
-    }
+    this.$contactsAndChats.next(currentContactsAndChats);
   }
 
   public setActive(cId: number, type: string) {

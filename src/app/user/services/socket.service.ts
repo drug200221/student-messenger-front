@@ -59,21 +59,16 @@ export class SocketService {
     const contactsAndChats = this.chatService.$contactsAndChats.value!;
     const lastReadMessage = contact.messages.find(message => message.messageId === contact.lastReadMessageUserId);
 
-    let newMessage = 0;
     if (lastReadMessage) {
-      contact.messages.forEach(m => {
-        if (m.messageId > lastReadMessage.messageId) {
-          newMessage++;
-        }
-      });
+      const newMessage = contact.messages.filter(m => m.messageId > lastReadMessage.messageId).length;
+
       const index = contactsAndChats.findIndex(c => c.id === contact.id && contact.type === 'contact');
-      contactsAndChats[index].newMessages = newMessage;
+      if (index !== -1) {
+        contactsAndChats[index].newMessagesCount = newMessage;
+        this.chatService.$contactsAndChats.next(contactsAndChats);
 
-      this.chatService.$contactsAndChats.next(contactsAndChats);
-    }
-
-    if (lastReadMessage) {
-      this.socket.emit('read messages', { message: lastReadMessage });
+        this.socket.emit('read messages', { message: lastReadMessage });
+      }
     }
   }
 }

@@ -82,7 +82,8 @@
         }
         @if (!maybeScrollToBottom()) {
           <div class="btn-down">
-            <button matBadge="{{ c.newMessages > 0 ? c.newMessages : '' }}" [matBadgeColor]="'accent'" color="primary"
+            <button matBadge="{{ c.newMessagesCount > 0 ? c.newMessagesCount : '' }}" [matBadgeColor]="'accent'"
+                    color="primary"
                     mat-fab
                     (click)="scrollBottom ? scrollToBottom() : scrollToFirstUnread(); scrollBottom = true;">
               <mat-icon>arrow_downward</mat-icon>

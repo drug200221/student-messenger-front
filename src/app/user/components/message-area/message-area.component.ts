@@ -71,7 +71,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
   protected readonly getDateLabel = getDateLabel;
   protected sidenavService = inject(SidenavService);
   protected c: CombinedContactsAndChats | undefined;
-  protected chatsService = inject(ChatService);
+  protected chatService = inject(ChatService);
   protected userService = inject(UserService);
   protected readonly shouldDisplayDate = shouldDisplayDate;
   private isScrollable = false;
@@ -127,10 +127,10 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
             this.chatMessageForm.controls.chatId.setValue(-1);
           }
           this.subscriptions.push(
-            this.chatsService.$contactsAndChats.subscribe(
+            this.chatService.$contactsAndChats.subscribe(
               cs => {
                 if (cs) {
-                  if (cs[cs.length - 1].id !== this.userService.$user.value?.id || cs[cs.length - 1].newMessages === 0) {
+                  if (cs[cs.length - 1].id !== this.userService.$user.value?.id || cs[cs.length - 1].newMessagesCount === 0) {
                     if (this.maybeScrollToBottom()) {
                       this.scrollToBottom();
                     }
@@ -151,7 +151,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
                 isArchived: false,
                 notify: true,
                 messages: [],
-                newMessages: 0,
+                newMessagesCount: 0,
                 type: 'contact',
                 isShowLoadMoreBtn: false,
               };
@@ -221,7 +221,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         const element = this.messageDisplayRef.nativeElement;
         element.scrollTop = element.scrollHeight;
-      }, 0);
+      }, 50);
     }
   }
 
@@ -229,8 +229,8 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
     this.sidenavService.toggleSidenav();
 
     if (window.innerWidth <= 600) {
-      this.chatsService.isActiveChatId = signal(-1);
-      this.chatsService.isActiveContactId = signal(-1);
+      this.chatService.isActiveChatId = signal(-1);
+      this.chatService.isActiveContactId = signal(-1);
       this.router.navigate(['../']);
     }
   }
@@ -247,7 +247,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
       }
     );
 
-    const contactsAndChats = this.chatsService.$contactsAndChats.value!;
+    const contactsAndChats = this.chatService.$contactsAndChats.value!;
     const index = contactsAndChats.findIndex(cc => c.id === cc.id && c.type === 'contact');
 
     setTimeout(() => {
@@ -260,7 +260,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
 
     if (index !== 1) {
       contactsAndChats[index] = c;
-      this.chatsService.$contactsAndChats.next(contactsAndChats);
+      this.chatService.$contactsAndChats.next(contactsAndChats);
     }
   }
 
@@ -274,9 +274,9 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
         fileId: this.contactMessageForm.value.replyMessageId as number | undefined,
       };
       if (this.messageService.$newContact.value !== null) {
-        const contacts = [...this.chatsService.$contactsAndChats.value!];
+        const contacts = [...this.chatService.$contactsAndChats.value!];
         contacts.push(this.c!);
-        this.chatsService.$contactsAndChats.next(contacts);
+        this.chatService.$contactsAndChats.next(contacts);
         this.messageService.$newContact.next(null);
       }
       this.messageService.send(request).subscribe({
@@ -286,6 +286,7 @@ export class MessageAreaComponent implements OnInit, OnDestroy {
             replyMessageId: null,
             fileId: null,
           });
+
           this.scrollToBottom();
 
           this.applyCooldown();

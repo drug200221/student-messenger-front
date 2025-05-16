@@ -34,7 +34,7 @@ interface IContactOrChat {
   isArchived: boolean;
   notify: boolean;
   messages: IContactOrChatMessage[];
-  newMessages: number;
+  newMessagesCount: number;
   isShowLoadMoreBtn: boolean;
 }
 
