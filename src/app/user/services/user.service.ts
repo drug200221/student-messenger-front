@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { IUser } from '../components/chats/user-chats-and-contacts';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
+import {IUser} from '../components/chats/user-chats';
 
 @Injectable({
   providedIn: 'root',

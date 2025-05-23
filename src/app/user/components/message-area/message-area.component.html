@@ -1,16 +1,16 @@
-@if (c) {
+@if (chat) {
   <div class="container">
     <mat-toolbar class="mat-elevation-z1">
       <button (click)="goBack()" class="btn-back" mat-icon-button>
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div class="person">
-        <div [ngClass]="c.color.toLowerCase()" class="avatar">
+        <div [ngClass]="chat.color.toLowerCase()" class="avatar">
           <img alt="" src=""/>
-          {{ c.type === "contact" ? getLetters(c.fullName!) : this.getLetters(c.title!) }}
+          {{ chat.title ? this.getLetters(chat.title) : 'ВЫ' }}
         </div>
         <div class="column">
-          <span class="user-title"><b>{{ c.type === "contact" ? c.fullName! : c.title! }}</b></span>
+          <span class="user-title"><b>{{ chat.title ?? 'Вы' }}</b></span>
           <span class="info">5 минут назад</span>
         </div>
       </div>
@@ -31,19 +31,19 @@
       </div>
     </mat-toolbar>
     <div class="messages">
-      <div #messageDisplay class="message-display" (mousemove)="onMouseMove()" (scrollend)="onScroll()">
-        @if (c.isShowLoadMoreBtn) {
+      <div #messageDisplay class="message-display" (mouseleave)="onMouseMove()" (scrollend)="onScroll()">
+        @if (chat.isShowLoadMoreBtn) {
           <div class="btn-center">
-            <button mat-button mat-stroked-button (click)="onLoadMore(c)">Загрузить еще</button>
+            <button mat-button mat-stroked-button (click)="onLoadMore(chat)">Загрузить еще</button>
           </div>
         }
-        @for (message of c.messages; track $index) {
-          <div *ngIf="shouldDisplayDate($index, c.messages)" class="date-divider">
+        @for (message of chat.messages; track $index) {
+          <div *ngIf="shouldDisplayDate($index, chat.messages)" class="date-divider">
             {{ getDateLabel(message.date.date) }}
           </div>
           @if (+message.sender.id === this.userService.$user.value?.id) {
             <div class="sender">
-              <mat-card>
+              <mat-card [id]="message.id">
                 <mat-card-content>{{ message.text }}</mat-card-content>
                 <mat-card-footer class="info">
                   @if (message.isEdited) {
@@ -51,7 +51,7 @@
                   }
                   <span class="text">{{ message.date.date | date: 'HH:mm' }}</span>
                   <span class="status icon">
-                    @if (message.messageId <= c.lastReadMessageContactId) {
+                    @if (message.id <= chat.lastReadMessageId) {
                       <mat-icon color="primary">check</mat-icon>
                       <mat-icon class="overlapping-icon" color="primary">check</mat-icon>
                     } @else {
@@ -63,13 +63,13 @@
             </div>
           } @else {
             <div class="recipient">
-              <div *ngIf="c.type === 'chat'" [ngClass]="message.sender.color" class="avatar">
+              <div *ngIf="!chat.isPrivate" [ngClass]="message.sender.color" class="avatar">
                 <img alt="" src=""/>
                 {{ getLetters(message.sender.fullName) }}
               </div>
-              <mat-card [id]="message.messageId"
-                        [ngClass]="message.messageId > c.lastReadMessageUserId ? 'unread' : ''">
-                <mat-card-title *ngIf="c.type === 'chat'"
+              <mat-card [id]="message.id"
+                        [ngClass]="message.id > chat.lastReadMessageId ? 'unread' : ''">
+                <mat-card-title *ngIf="!chat.isPrivate"
                                 [ngClass]="'text_' + message.sender.color">{{ message.sender.fullName }}
                 </mat-card-title>
                 <mat-card-content>{{ message.text }}</mat-card-content>
@@ -80,42 +80,28 @@
             </div>
           }
         }
-        @if (!maybeScrollToBottom()) {
+        @if (!maScrollService.maybeScrollToBottom(messageDisplayRef)) {
           <div class="btn-down">
-            <button matBadge="{{ c.newMessagesCount > 0 ? c.newMessagesCount : '' }}" [matBadgeColor]="'accent'"
+            <button matBadge="{{ chat.newMessagesCount > 0 ? chat.newMessagesCount : '' }}" [matBadgeColor]="'accent'"
                     color="primary"
                     mat-fab
-                    (click)="scrollBottom ? scrollToBottom() : scrollToFirstUnread(); scrollBottom = true;">
+                    (click)="maScrollService.scrollDownOnClick(messageDisplayRef)">
               <mat-icon>arrow_downward</mat-icon>
             </button>
           </div>
         }
       </div>
-      @if (c.type === 'contact') {
-        <form (ngSubmit)="sendInContact()" class="message-input"
-              [formGroup]="contactMessageForm!">
-          <mat-form-field>
-            <input formControlName="text" matInput placeholder="Сообщение">
-            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-            <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
-          </mat-form-field>
-          <button [disabled]="isSending" [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
-            <mat-icon>send</mat-icon>
-          </button>
-        </form>
-      } @else if (c.type === 'chat') {
-        <form (ngSubmit)="sendInChat()" class="message-input"
-              [formGroup]="chatMessageForm!">
-          <mat-form-field>
-            <input formControlName="text" matInput placeholder="Сообщение">
-            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-            <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
-          </mat-form-field>
-          <button [disabled]="isSending" [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
-            <mat-icon>send</mat-icon>
-          </button>
-        </form>
-      }
+      <form (ngSubmit)="send()" class="message-input"
+            [formGroup]="chatMessageForm!">
+        <mat-form-field>
+          <input formControlName="text" matInput placeholder="Сообщение">
+          <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+          <mat-icon matSuffix style="transform: rotate(40deg);">attach_file</mat-icon>
+        </mat-form-field>
+        <button [disabled]="isSending" [style.margin-top]="'4px'" color="primary" mat-icon-button type="submit">
+          <mat-icon>send</mat-icon>
+        </button>
+      </form>
     </div>
   </div>
 }

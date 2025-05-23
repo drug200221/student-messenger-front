@@ -2,31 +2,23 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { IApiResponse } from '../../../core/interfaces/api-response';
 import { BehaviorSubject, catchError, map, of, tap } from 'rxjs';
-import { IContactOrChatMessage, IUser } from '../chats/user-chats-and-contacts';
+import { IChat, IMessage, IUser } from '../chats/user-chats';
 import { env } from '../../../../env/env';
-import { IMessageRequest } from './contact-message_request';
+import { IMessageRequest, IReadMessageRequest } from './message_request';
 import { SocketService } from '../../services/socket.service';
-import { CombinedContactsAndChats } from '../chats/combine-and-sort.messages';
-import { IReadMessageRequest } from './read-message_request';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
-  public $newContact = new BehaviorSubject<IUser | null>(null);
+  public $newChat = new BehaviorSubject<IUser | null>(null);
   private socketService = inject(SocketService);
   private http = inject(HttpClient);
 
-  public getMessages(c: CombinedContactsAndChats, loadMessageCount: number) {
-    let queryString = '';
+  public getMessages(chat: IChat, loadMessageCount: number) {
+    const queryString = `chat-id=${chat.id}}&load-message-count=${loadMessageCount}`;
 
-    if (c.type === 'chat') {
-      queryString = `chatId=${c.id}&load-message-count=${loadMessageCount}`;
-    } else if (c.type === 'contact') {
-      queryString = `contactId=${c.id}&load-message-count=${loadMessageCount}`;
-    }
-
-    return this.http.get<IApiResponse<IContactOrChatMessage[]>>(`${env.baseApiUrl}/chat-contact/?${queryString}`).pipe(
+    return this.http.get<IApiResponse<IMessage[]>>(`${env.baseApiUrl}/chats/?${queryString}`).pipe(
       map((response) => {
         if (response.result) {
           return response.result;
@@ -40,11 +32,14 @@ export class MessageService {
     );
   }
 
-  public send(request: IMessageRequest) {
-    return this.http.post<IApiResponse<IContactOrChatMessage>>(`${env.baseApiUrl}/chat-contact/`, request).pipe(
-      tap(response => {
+  public send(chat: IChat, request: IMessageRequest) {
+    return this.http.post<IApiResponse<IMessage>>(`${env.baseApiUrl}/chats/`, request).pipe(
+      map(response => {
         if (response.result) {
-          this.socketService.sendMessage(response.result);
+          this.socketService.sendMessage(chat.participants, response.result);
+          if (chat.id < 0) {
+            chat.id = response.result.chatId;
+          }
         }
       }),
       catchError((error) => {
@@ -54,11 +49,11 @@ export class MessageService {
     );
   }
 
-  public read(c: CombinedContactsAndChats, request: IReadMessageRequest) {
-    return this.http.put<IApiResponse<IContactOrChatMessage>>(`${env.baseApiUrl}/chat-contact/${c.id}`, request).pipe(
+  public read(chat: IChat, request: IReadMessageRequest) {
+    return this.http.put<IApiResponse<IMessage>>(`${env.baseApiUrl}/chats/${chat.id}`, request).pipe(
       tap(response => {
         if (response.result) {
-          this.socketService.markMessagesAsRead(c);
+          this.socketService.markMessagesAsRead(chat);
         }
       }),
       catchError((error) => {

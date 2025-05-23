@@ -9,8 +9,4 @@ export class SidenavService {
   public toggleSidenav() {
     this.isSidenavOpened.set(!this.isSidenavOpened());
   }
-
-  public getChats(userId: number) {
-    return userId;
-  }
 }

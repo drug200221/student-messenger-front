@@ -1,10 +1,10 @@
-import { CombinedContactsAndChats } from '../../user/components/chats/combine-and-sort.messages';
+import { IChat } from '../../user/components/chats/user-chats';
 
 /**
  * Функция для сортировки чатов и контактов по времени (самые новые сверху)
  * @param items
  */
-export function sortContactsAndChats(items: CombinedContactsAndChats[] | null) {
+export function sortChatsByTime(items: IChat[] | null) {
   if (items !== null) {
     return items.sort((a, b) => {
 

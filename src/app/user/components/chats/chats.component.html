@@ -1,5 +1,5 @@
 <div class="field-search">
-  @if (this.isShowSearch()) {
+  @if (this.isSearch()) {
     <button [style.margin-top]="'4px'" mat-icon-button (click)="resetSearch()">
       <mat-icon>arrow_back</mat-icon>
     </button>
@@ -16,12 +16,12 @@
     </mat-menu>
   }
   <mat-form-field [formGroup]="this.searchForm" subscriptSizing="dynamic">
-    <input (focusin)="this.isShowSearch.set(true)" formControlName="search" matInput placeholder="Поиск">
+    <input (focusin)="this.isSearch.set(true)" formControlName="search" matInput placeholder="Поиск">
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 </div>
 
-@if (this.isShowSearch()) {
+@if (this.isSearch()) {
   <div class="overflow">
     @if (this.searchForm.controls.search.value === '') {
       <mat-nav-list>
@@ -30,11 +30,11 @@
     } @else {
       <mat-nav-list>
         @if (searchResult && searchResult.length > 0) {
-          @for (c of searchResult; track $index) {
-            <mat-list-item [routerLink]="['contacts', c.id]"
-                           (click)="this.chatsService.setActive(c.id, 'contact'); this.messageService.$newContact.next(c)"
+          @for (chat of searchResult; track $index) {
+            <mat-list-item [routerLink]="['chats', chat.id]"
+                           (click)="onClickChat(chat)"
                            routerLinkActive="active">
-              <psk-chat-item [u]="c"></psk-chat-item>
+              <psk-chat-item [chat]="chat"></psk-chat-item>
             </mat-list-item>
           }
         } @else {
@@ -47,19 +47,12 @@
   <mat-tab-group>
     <mat-tab label="Все">
       <mat-nav-list>
-        @if (contactsAndChats && contactsAndChats.length > 0) {
-          @for (c of contactsAndChats; track $index) {
-            @if (c.type === 'contact') {
-              <mat-list-item (click)="onClickChat(c)"
-                             [routerLink]="['contacts', c.id]" routerLinkActive="active">
-                <psk-chat-item [c]="c"></psk-chat-item>
-              </mat-list-item>
-            } @else if (c.type === 'chat') {
-              <mat-list-item (click)="onClickChat(c)"
-                             [routerLink]="['chats', c.id]" routerLinkActive="active">
-                <psk-chat-item [c]="c"></psk-chat-item>
-              </mat-list-item>
-            }
+        @if (chats && chats.length > 0) {
+          @for (chat of chats; track $index) {
+            <mat-list-item (click)="onClickChat(chat)"
+                           [routerLink]="['chats', chat.id]" routerLinkActive="active">
+              <psk-chat-item [chat]="chat"></psk-chat-item>
+            </mat-list-item>
           }
         } @else {
           <div class="m-0-8">Не добавлен ни один контакт. Воспользуйтесь поиском</div>

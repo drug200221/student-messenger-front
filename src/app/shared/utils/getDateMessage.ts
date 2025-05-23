@@ -1,7 +1,7 @@
-import { DateTime } from '../../user/components/chats/user-chats-and-contacts';
+import { DateTime } from '../../user/components/chats/user-chats';
 
 /**
- * Функция для форматирования даты сообщения
+ * Форматирование даты сообщения
  * @param dateTime
  */
 export function getDateMessage(dateTime: DateTime): string {

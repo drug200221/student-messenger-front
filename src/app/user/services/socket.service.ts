@@ -1,9 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { io } from 'socket.io-client';
 import { env } from '../../../env/env';
-import { IContactOrChatMessage } from '../components/chats/user-chats-and-contacts';
+import { IChat, IMessage, IParticipant } from '../components/chats/user-chats';
 import { ChatService } from '../components/chats/chat.service';
-import { CombinedContactsAndChats } from '../components/chats/combine-and-sort.messages';
 
 @Injectable({
   providedIn: 'root',
@@ -19,18 +18,14 @@ export class SocketService {
       console.log(event, args);
     });
 
-    this.socket.on('private message', ({ message }) => {
-      this.chatService.addMessage(message);
-      console.log('Received private message:', { message });
-    });
-
-    this.socket.on('chat message', ({ message }) => {
-      console.log('Received chat message:', { message });
+    this.socket.on('message', ({ recipientId, message }) => {
+      this.chatService.addMessage(recipientId, message);
+      console.log('Received message:', { recipientId, message });
     });
 
     this.socket.on('read messages', ({ message }) => {
-      this.chatService.viewContactMessages(message);
-      console.log('Read private message:', { message });
+      this.chatService.readMessages(message);
+      console.log('Last read message:', { message });
     });
   }
 
@@ -45,30 +40,35 @@ export class SocketService {
     });
   }
 
-  public sendMessage(message: IContactOrChatMessage) {
-    this.chatService.addMessage(message);
-
-    if (message.recipientId) {
-      this.socket.emit('private message', { message: message });
-    } else if (message.chatId) {
-      this.socket.emit('chat message', { message: message });
-    }
+  public sendMessage(participants: IParticipant[], message: IMessage) {
+    participants.forEach(participant => {
+      this.socket.emit('message', { recipientId: participant.id, message: message });
+    });
   }
 
-  public markMessagesAsRead(contact: CombinedContactsAndChats) {
-    const contactsAndChats = this.chatService.$contactsAndChats.value!;
-    const lastReadMessage = contact.messages.find(message => message.messageId === contact.lastReadMessageUserId);
+  public markMessagesAsRead(chat: IChat) {
+    const chats = this.chatService.$chats.value!;
+    const lastReadMessage = chat.messages.find(message => message.id === chat.lastReadMessageId);
 
     if (lastReadMessage) {
-      const newMessage = contact.messages.filter(m => m.messageId > lastReadMessage.messageId).length;
+      const newMessagesCount = chat.messages.filter(m => m.id > lastReadMessage.id).length;
 
-      const index = contactsAndChats.findIndex(c => c.id === contact.id && contact.type === 'contact');
+      const index = chats.findIndex(c => c.id === chat.id);
       if (index !== -1) {
-        contactsAndChats[index].newMessagesCount = newMessage;
-        this.chatService.$contactsAndChats.next(contactsAndChats);
+        if (chat.messages.find(m => m.id === chat.lastMessageId && +m.sender.id === chat.userId)) {
+          chats[index].newMessagesCount = 0;
+        } else {
+          chats[index].newMessagesCount = newMessagesCount;
+        }
+
+        this.chatService.$chats.next(chats);
 
         this.socket.emit('read messages', { message: lastReadMessage });
       }
     }
+  }
+
+  public disconnect() {
+    this.socket.disconnect();
   }
 }

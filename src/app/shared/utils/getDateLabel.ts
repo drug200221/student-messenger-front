@@ -1,3 +1,5 @@
+import { IMessage } from '../../user/components/chats/user-chats';
+
 export function getDateLabel(inputDate: string | Date) {
   let date: Date;
 
@@ -33,4 +35,19 @@ export function getDateLabel(inputDate: string | Date) {
       date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) :
       date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
   }
+}
+
+/**
+ * Проверка отображения даты
+ * @param $index
+ * @param messages
+ */
+export function shouldDisplayDate($index: number, messages: IMessage[]) {
+  if ($index === 0) {
+    return true;
+  }
+
+  const currentDate = new Date(messages[$index].date.date).setHours(0, 0, 0, 0);
+  const prevDate = new Date(messages[$index - 1].date.date).setHours(0, 0, 0, 0);
+  return currentDate > prevDate;
 }

@@ -6,6 +6,7 @@ import { ChatsComponent } from '../../user/components/chats/chats.component';
 import { ChatService } from '../../user/components/chats/chat.service';
 import { UserService } from '../../user/services/user.service';
 import { SocketService } from '../../user/services/socket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'psk-sidenav',
@@ -20,10 +21,12 @@ import { SocketService } from '../../user/services/socket.service';
   styleUrl: './sidenav.component.scss',
 })
 export class SidenavComponent implements OnInit, OnDestroy {
-  protected sidenavService = inject(SidenavService);
+  public sidenavService = inject(SidenavService);
   private userService = inject(UserService);
   private socketService = inject(SocketService);
   private chatsService = inject(ChatService);
+
+  private subscription = new Subscription();
 
   @HostListener('window:resize', ['$event'])
   public onResize(event: Event) {
@@ -33,7 +36,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
     } else if (this.sidenavService.isSidenavOpened()) {
       if (target.innerWidth <= 920) {
         if (target.innerWidth <= 600) {
-          if (this.chatsService.isActiveChatId() === -1 && this.chatsService.isActiveContactId() === -1) {
+          if (this.chatsService.isActiveChatId() === -1) {
             this.sidenavService.isSidenavOpened = signal(true);
           } else {
             this.sidenavService.isSidenavOpened = signal(false);
@@ -46,16 +49,19 @@ export class SidenavComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.userService.$user.subscribe(
-      user => {
-        if (user) {
-          this.socketService.connect(user.id.toString());
+    this.subscription.add(
+      this.userService.$user.subscribe(
+        user => {
+          if (user) {
+            this.socketService.connect(user.id.toString());
+          }
         }
-      }
+      )
     );
   }
 
   public ngOnDestroy(): void {
-    return;
+    this.subscription.unsubscribe();
+    this.socketService.disconnect();
   }
 }

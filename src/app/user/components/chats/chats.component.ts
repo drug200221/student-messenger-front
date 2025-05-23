@@ -8,13 +8,11 @@ import { MatFabButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { ChatService } from './chat.service';
-import { CombinedContactsAndChats } from './combine-and-sort.messages';
 import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
-import { sortContactsAndChats } from '../../../shared/utils/sortContactsAndChats';
+import { sortChatsByTime } from '../../../shared/utils/sortChatsByTime';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { IUser } from './user-chats-and-contacts';
-import { MessageService } from '../message-area/message.service';
+import { IChat } from './user-chats';
 import { MessageInteractionService } from '../message-area/message-interaction.service';
 
 @Component({
@@ -44,25 +42,24 @@ import { MessageInteractionService } from '../message-area/message-interaction.s
   styleUrl: './chats.component.scss',
 })
 export class ChatsComponent implements OnInit, OnDestroy {
-  public contactsAndChats: CombinedContactsAndChats[] | null = null;
-  public searchResult: IUser[] | null = null;
+  public chats: IChat[] | null = null;
+  public searchResult: IChat[] = [];
   public fb = inject(FormBuilder);
   public searchForm = this.fb.group({
     search: [''],
   });
-  public isShowSearch = signal<boolean>(false);
-  protected chatsService = inject(ChatService);
-  protected messageService = inject(MessageService);
+  public isSearch = signal<boolean>(false);
+  public chatService = inject(ChatService);
   private messageInteractionService = inject(MessageInteractionService);
   private subscriptions: Subscription[] = [];
 
   public ngOnInit() {
     this.subscriptions.push(
-      this.chatsService.$contactsAndChats.subscribe(contactsAndChats => {
-        if (contactsAndChats) {
-          this.contactsAndChats = sortContactsAndChats(contactsAndChats);
+      this.chatService.$chats.subscribe(chats => {
+        if (chats) {
+          this.chats = sortChatsByTime(chats);
         } else {
-          this.chatsService.getChatsAndContacts().subscribe();
+          this.chatService.getChats().subscribe();
         }
       })
     );
@@ -72,10 +69,16 @@ export class ChatsComponent implements OnInit, OnDestroy {
         distinctUntilChanged()
       ).subscribe(value => {
         if (value && value.trim() !== '') {
-          this.chatsService.search(value).subscribe(
-            result => this.searchResult = result
+          this.chatService.search(value).subscribe(
+            result => {
+              this.searchResult = result;
+            }
           );
         } else {
+          const chats = this.chatService.$chats.value ?? [];
+          chats.filter(ch => ch.id <= 0);
+          this.chatService.$chats.next(chats.filter(ch => ch.id > 0));
+
           this.searchResult = [];
         }
       })
@@ -86,17 +89,27 @@ export class ChatsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  public onClickChat(c: CombinedContactsAndChats) {
-    this.chatsService.setActive(c.id, c.type);
-    this.messageService.$newContact.next(null);
+  public onClickChat(chat: IChat) {
+    this.chatService.setActive(chat.id);
+
+    if (chat.id <= 0) {
+      const chats = this.chatService.$chats.value ?? [];
+      chats.push(chat);
+
+      this.chatService.$chats.next(chats);
+    }
+
     setTimeout(() => {
       this.messageInteractionService.triggerScrollToFirstUnread();
     }, 0);
   }
 
   protected resetSearch() {
-    this.isShowSearch.set(false);
+    const chats = this.chatService.$chats.value ?? [];
+    this.chatService.$chats.next(chats.filter(ch => ch.id > 0));
+
+    this.isSearch.set(false);
     this.searchForm.controls.search.setValue('');
-    this.searchResult = null;
+    this.searchResult = [];
   }
 }
